@@ -4,6 +4,7 @@ import { listerClubsAvecEffectif } from '../../storage/clubs'
 import { pluriel } from '../format'
 import { DialogueClub } from './DialogueClub'
 import { FicheClub } from './FicheClub'
+import { ImportWebaffiligue } from './ImportWebaffiligue'
 
 export function EcranClubs({ onRetour }: { onRetour: () => void }) {
   const clubs = useLiveQuery(() => listerClubsAvecEffectif(), [])
@@ -36,6 +37,7 @@ export function EcranClubs({ onRetour }: { onRetour: () => void }) {
         <button className="btn" onClick={() => setCreation(true)}>
           Nouveau club
         </button>
+        <ImportWebaffiligue />
       </div>
       {creation && <DialogueClub club={null} onFermer={() => setCreation(false)} />}
     </section>
