@@ -71,6 +71,27 @@ describe('encodage d’une équipe', () => {
     )
   })
 
+  it('refuse un code de plus de 4 000 caractères, sans le décoder', () => {
+    let graine = 12345
+    const aleatoire = Array.from({ length: 5000 }, () => {
+      graine = (Math.imul(graine, 1103515245) + 12345) >>> 0
+      return ALPHABET[(graine >>> 16) % ALPHABET.length]
+    }).join('')
+    const long = forger({ v: 1, n: aleatoire, c: '', k: null, j: [] })
+    expect(long.length).toBeGreaterThan(4000)
+    expect(() => decoderEquipe(long)).toThrow(CODE_NON_RECONNU)
+    expect(() => lireCodeEquipe(long)).toThrow(CODE_NON_RECONNU)
+  })
+
+  it('refuse une équipe de plus de 14 joueurs, même avec une somme de contrôle valide', () => {
+    const joueur = (numero: number) => ['', 'A', 'B', 'F', numero]
+    const quatorze = Array.from({ length: 14 }, (_, i) => joueur(i))
+    expect(decoderEquipe(forger({ v: 1, n: 'X', c: '', k: null, j: quatorze })).joueurs).toHaveLength(14)
+    expect(() => decoderEquipe(forger({ v: 1, n: 'X', c: '', k: null, j: [...quatorze, joueur(14)] }))).toThrow(
+      CODE_NON_RECONNU,
+    )
+  })
+
   it('refuse un code dont un caractère a été modifié', () => {
     const code = encoderEquipe(EQUIPE)
     for (let i = 0; i < code.length; i++) {
@@ -106,6 +127,20 @@ describe('liens et saisie tolérante', () => {
     expect(extraireCode(`${code.slice(0, 20)}\n${code.slice(20)}`)).toBe(code)
     expect(extraireCode('Voici notre équipe !')).toBeNull()
     expect(extraireCode('   ')).toBeNull()
+  })
+
+  it('extrait un code seul entouré de guillemets, de ponctuation ou d’un libellé', () => {
+    expect(extraireCode(`"${code}"`)).toBe(code)
+    expect(extraireCode(`« ${code} »`)).toBe(code)
+    expect(extraireCode(`${code}.`)).toBe(code)
+    expect(extraireCode(`Code : ${code}`)).toBe(code)
+    expect(lireCodeEquipe(`Code : ${code}`)).toEqual(EQUIPE)
+    expect(lireCodeEquipe(`« ${code.slice(0, 20)}\n${code.slice(20)} »`)).toEqual(EQUIPE)
+  })
+
+  it('refuse un texte sans code', () => {
+    expect(() => lireCodeEquipe('Bonjour, voici la composition de notre équipe !')).toThrow(CODE_NON_RECONNU)
+    expect(() => lireCodeEquipe('Notre équipe : https://exemple.org/table/ Merci')).toThrow(CODE_NON_RECONNU)
   })
 
   it('extrait le code d’un lien suivi de texte', () => {

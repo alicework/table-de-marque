@@ -5,6 +5,8 @@ import type { Civilite } from '../domain/types'
 export const VERSION_FORMAT_EQUIPE = 1
 export const PARAMETRE_LIEN = 'equipe'
 export const CODE_NON_RECONNU = "Code non reconnu : vérifiez qu'il a été copié en entier."
+/** Un QR ne contient pas plus d'environ 2 953 octets : au-delà, ce n'est pas un code d'équipe. */
+const LONGUEUR_CODE_MAX = 4000
 export const CODE_TROP_RECENT = "Ce code vient d'une version plus récente de l'application : mettez-la à jour."
 
 export interface JoueurPartage {
@@ -75,6 +77,11 @@ function empreinte(octets: Uint8Array): number {
   return hash
 }
 
+/**
+ * Le conteneur est figé : deflate brut, puis 4 octets de somme de contrôle à la fin, le tout en base64url.
+ * Toute version future doit le conserver pour que les anciennes versions de l'application puissent
+ * lire le champ `v` (dans le JSON compressé) et afficher « mettez à jour » au lieu de « code non reconnu ».
+ */
 export function encoderEquipe(equipe: EquipePartagee): string {
   let coach: EquipeCompacte['k'] = null
   if (equipe.coach?.type === 'joueur') coach = equipe.coach.index
@@ -111,13 +118,14 @@ function estEquipeCompacte(valeur: unknown): valeur is EquipeCompacte {
   if (typeof valeur !== 'object' || valeur === null) return false
   const e = valeur as Partial<EquipeCompacte>
   if (e.v !== VERSION_FORMAT_EQUIPE || typeof e.n !== 'string' || typeof e.c !== 'string') return false
-  if (!Array.isArray(e.j) || !e.j.every(estJoueurCompact)) return false
+  if (!Array.isArray(e.j) || e.j.length > REGLES.joueursMax || !e.j.every(estJoueurCompact)) return false
   if (e.k === null || typeof e.k === 'string') return true
   return typeof e.k === 'number' && Number.isInteger(e.k) && e.k >= 0 && e.k < e.j.length
 }
 
 /** Octets JSON d'un code, après contrôle de la somme de contrôle ; lève si le code est altéré. */
 function lireJson(code: string): Uint8Array {
+  if (code.length > LONGUEUR_CODE_MAX) throw new Error('code trop long')
   const octets = depuisBase64Url(code)
   if (octets.length < 5) throw new Error('code trop court')
   const json = inflateSync(octets.subarray(0, -4))
@@ -168,18 +176,22 @@ export function lienEquipe(code: string, adresseApp: string): string {
 }
 
 /**
- * Accepte un lien complet ou le code seul, même coupé par des espaces ou des retours à la ligne.
+ * Accepte un lien complet ou le code seul, même coupé par des espaces ou des retours à la ligne,
+ * ou entouré de texte (guillemets, ponctuation, libellé).
  * Un lien suivi de texte (« …#equipe=CODE\nMerci ») et un lien coupé en deux (« …#equipe=CO\nDE ») se ressemblent :
- * on retient la première lecture dont la somme de contrôle est valide.
+ * on retient la première lecture dont la somme de contrôle est valide, sinon la première lecture.
  */
 export function extraireCode(saisie: string): string | null {
   const texte = saisie.replace(/\s+/g, '')
   if (!texte) return null
   const motif = new RegExp(`[#?&]${PARAMETRE_LIEN}=([A-Za-z0-9_-]+)`)
+  const suites = (source: string) => source.match(/[A-Za-z0-9_-]{16,}/g) ?? []
   const candidats = [
     motif.exec(saisie)?.[1],
     motif.exec(texte)?.[1],
     /^[A-Za-z0-9_-]+$/.test(texte) ? texte : undefined,
+    ...suites(saisie),
+    ...suites(texte),
   ].filter((candidat): candidat is string => candidat !== undefined)
   return candidats.find(estIntegre) ?? candidats[0] ?? null
 }
