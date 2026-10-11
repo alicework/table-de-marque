@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
+import { encoderEquipe } from './roster-share/format'
 import { enregistrerMatch } from './storage/matchs'
 import { matchDeTest, panier } from './test/fixtures'
 import { remplirEquipe } from './test/remplirEquipe'
@@ -124,5 +125,57 @@ describe('App — bandeau de mise à jour', () => {
     await user.click(await screen.findByRole('button', { name: 'Nouveau match' }))
     await screen.findByRole('heading', { name: 'Nouveau match' })
     expect(bandeau()).not.toBeInTheDocument()
+  })
+})
+
+const CODE_GRADIGNAN = encoderEquipe({
+  nom: 'GRADIGNAN',
+  couleur: 'Noir',
+  joueurs: [
+    { licence: '033_5', nom: 'Bernard', prenom: 'Jade', civilite: 'Mme', numero: 5 },
+    { licence: '033_8', nom: 'Moreau', prenom: 'Sam', civilite: 'M', numero: 8 },
+  ],
+  coach: null,
+})
+
+describe('équipe reçue par lien', () => {
+  it("ouvre l'écran Équipe reçue même pendant un match, puis prépare un match avec l'équipe en B", async () => {
+    await enregistrerMatch(matchDeTest(panier('A', 'a7', 2)))
+    const user = userEvent.setup()
+    render(<App codeEquipe={CODE_GRADIGNAN} />)
+    expect(await screen.findByRole('heading', { name: 'Équipe reçue' })).toBeInTheDocument()
+    expect(screen.getByRole('list', { name: 'Joueurs de GRADIGNAN' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Nouveau match : en équipe B' }))
+    const groupeB = within(await screen.findByRole('group', { name: 'Équipe B' }))
+    expect(groupeB.getByLabelText("Nom de l'équipe")).toHaveValue('GRADIGNAN')
+    expect(groupeB.getByLabelText('N° joueur 2')).toHaveValue('8')
+    await user.click(screen.getByRole('button', { name: 'Retour' }))
+    expect(await screen.findByRole('button', { name: /Reprendre le match en cours/ })).toBeInTheDocument()
+  })
+
+  it('explique un lien illisible et propose les autres moyens', async () => {
+    render(<App codeEquipe="#equipe=%%%" />)
+    expect(await screen.findByRole('heading', { name: 'Équipe reçue' })).toBeInTheDocument()
+    expect(screen.getAllByRole('alert')[0]).toHaveTextContent('Code non reconnu')
+    expect(screen.getByRole('dialog', { name: 'Importer une équipe' })).toBeInTheDocument()
+  })
+
+  it("propose de copier le code quand le lien s'est ouvert dans le navigateur", async () => {
+    const user = userEvent.setup()
+    render(<App codeEquipe={CODE_GRADIGNAN} />)
+    await user.click(await screen.findByRole('button', { name: 'Copier le code' }))
+    expect(await navigator.clipboard.readText()).toBe(CODE_GRADIGNAN)
+  })
+
+  it("importe une équipe depuis l'accueil", async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Importer une équipe' }))
+    await user.type(screen.getByLabelText('Coller le lien ou le code'), CODE_GRADIGNAN)
+    await user.click(screen.getByRole('button', { name: 'Lire le code' }))
+    await user.click(screen.getByRole('button', { name: 'Utiliser cette équipe' }))
+    await user.click(await screen.findByRole('button', { name: 'Nouveau match : en équipe A' }))
+    const groupeA = within(await screen.findByRole('group', { name: 'Équipe A' }))
+    expect(groupeA.getByLabelText("Nom de l'équipe")).toHaveValue('GRADIGNAN')
   })
 })

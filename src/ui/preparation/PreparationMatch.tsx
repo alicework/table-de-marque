@@ -1,22 +1,24 @@
 import { useRef, useState } from 'react'
 import { verifierEquipe } from '../../domain/equipe'
 import { nouveauMatch } from '../../domain/match'
+import type { EquipeId } from '../../domain/types'
 import { enregistrerMatch } from '../../storage/matchs'
 import { aujourdhui } from '../format'
 import { MESSAGE_ERREUR_STOCKAGE } from '../useMatch'
-import { brouillonVersEquipe, brouillonVide } from './brouillon'
+import { brouillonVersEquipe, brouillonVide, type BrouillonEquipe } from './brouillon'
 import { EditeurEquipe } from './EditeurEquipe'
 
 interface Props {
   onDemarre: (matchId: string) => void
   onRetour: () => void
+  equipesInitiales?: Partial<Record<EquipeId, BrouillonEquipe>>
 }
 
-export function PreparationMatch({ onDemarre, onRetour }: Props) {
+export function PreparationMatch({ onDemarre, onRetour, equipesInitiales }: Props) {
   const [date, setDate] = useState(() => aujourdhui())
   const [lieu, setLieu] = useState('')
-  const [equipeA, setEquipeA] = useState(brouillonVide)
-  const [equipeB, setEquipeB] = useState(brouillonVide)
+  const [equipeA, setEquipeA] = useState(() => equipesInitiales?.A ?? brouillonVide())
+  const [equipeB, setEquipeB] = useState(() => equipesInitiales?.B ?? brouillonVide())
   const [tentative, setTentative] = useState(false)
   const [erreurStockage, setErreurStockage] = useState<string | null>(null)
   const [enCours, setEnCours] = useState(false)
