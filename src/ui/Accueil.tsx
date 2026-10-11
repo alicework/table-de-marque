@@ -1,5 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useState } from 'react'
 import { matchEnCours } from '../storage/matchs'
+import { Dialogue } from './commun/Dialogue'
 
 interface Props {
   onNouveauMatch: () => void
@@ -8,6 +10,17 @@ interface Props {
 
 export function Accueil({ onNouveauMatch, onReprendre }: Props) {
   const enCours = useLiveQuery(() => matchEnCours(), [])
+  const [confirmation, setConfirmation] = useState(false)
+
+  // Un second match en cours rendrait le premier inaccessible : on prévient avant.
+  function demanderNouveauMatch() {
+    if (enCours) {
+      setConfirmation(true)
+    } else {
+      onNouveauMatch()
+    }
+  }
+
   return (
     <section className="ecran accueil">
       <h1>Table de marque</h1>
@@ -21,9 +34,26 @@ export function Accueil({ onNouveauMatch, onReprendre }: Props) {
           </small>
         </button>
       )}
-      <button className="btn" onClick={onNouveauMatch}>
+      <button className="btn" onClick={demanderNouveauMatch}>
         Nouveau match
       </button>
+      {confirmation && (
+        <Dialogue
+          titre="Un match est en cours"
+          actions={
+            <>
+              <button className="btn btn-principal" onClick={onNouveauMatch}>
+                Créer un nouveau match
+              </button>
+              <button className="btn" onClick={() => setConfirmation(false)}>
+                Annuler
+              </button>
+            </>
+          }
+        >
+          <p>Il restera enregistré mais ne sera plus repris automatiquement.</p>
+        </Dialogue>
+      )}
     </section>
   )
 }

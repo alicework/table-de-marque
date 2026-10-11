@@ -11,7 +11,8 @@ type Ecran = { nom: 'chargement' } | { nom: 'accueil' } | { nom: 'preparation' }
 export default function App() {
   const [ecran, setEcran] = useState<Ecran>({ nom: 'chargement' })
   const enCours = useLiveQuery(() => matchEnCours(), [])
-  const miseAJourAutorisee = ecran.nom !== 'match' && ecran.nom !== 'chargement' && !enCours
+  // Recharger ne doit jamais interrompre un match ni perdre le formulaire de préparation.
+  const miseAJourAutorisee = ecran.nom === 'accueil' && !enCours
 
   useEffect(() => {
     let actif = true
