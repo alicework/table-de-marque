@@ -23,8 +23,8 @@ function decrireBilan(bilan: BilanImportClub): string {
 function ListeBilans({ bilans }: { bilans: BilanImportClub[] }) {
   return (
     <ul className="liste-joueurs">
-      {bilans.map((bilan) => (
-        <li key={bilan.nom}>{decrireBilan(bilan)}</li>
+      {bilans.map((bilan, index) => (
+        <li key={index}>{decrireBilan(bilan)}</li>
       ))}
     </ul>
   )
@@ -62,7 +62,7 @@ export function ImportWebaffiligue() {
         Importer un export Webaffiligue
         <input
           type="file"
-          accept=".csv,text/csv"
+          accept=".csv,text/csv,application/vnd.ms-excel,text/comma-separated-values,text/plain"
           className="masque"
           onChange={(e) => {
             void lire(e.target.files?.[0])

@@ -58,6 +58,21 @@ describe('Import Webaffiligue', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
+  it('liste deux associations de même nom sans clé React en double', async () => {
+    const erreurs = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const user = await afficher()
+    const csv = [
+      'N° Association;Nom association;Type licence;N° Adherent;Civilite;Nom;Prénom',
+      '033550002;MEME NOM;Loisirs;033_1;M;Martin;Hugo',
+      '033550003;MEME NOM;Loisirs;033_2;Mme;Durand;Léa',
+    ].join('\n')
+    await user.upload(screen.getByLabelText('Importer un export Webaffiligue'), fichier(csv))
+    const apercu = within(await screen.findByRole('dialog', { name: 'Import Webaffiligue' }))
+    expect(apercu.getAllByText(/MEME NOM \(nouveau club\)/)).toHaveLength(2)
+    expect(erreurs).not.toHaveBeenCalled()
+    erreurs.mockRestore()
+  })
+
   it('signale les lignes sans licence ignorées', async () => {
     const user = await afficher()
     const texte = `${EXPORT.toString('latin1').trimEnd()}\n"=""Basket ball""";"=""033550002""";"=""SAINT DELPHIN BASKET""";Oui;"=""Loisirs""";"=""""";"=""M""";;;;;;;;;;;;\n`
