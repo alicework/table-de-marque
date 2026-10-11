@@ -11,11 +11,16 @@ async function remplirEquipe(page: Page, legende: string, nom: string, joueurs: 
   }
 }
 
+// Garde anti-double-tap de l'écran de match : tout tap accepté rend l'écran sourd pendant 300 ms.
+async function attendreGarde(page: Page) {
+  await page.waitForTimeout(350)
+}
+
 async function marquer(page: Page, equipe: string, bouton: string, numero: number) {
   await page.getByRole('group', { name: `Actions ${equipe}` }).getByRole('button', { name: bouton, exact: true }).click()
+  await attendreGarde(page)
   await page.getByRole('button', { name: new RegExp(`^n°${numero},`) }).click()
-  // Garde anti double-tap : les boutons d'action sont ignorés pendant 400 ms après le choix d'un joueur.
-  await page.waitForTimeout(450)
+  await attendreGarde(page)
 }
 
 test('un match se saisit, se corrige, survit à un rechargement et se termine', async ({ page }) => {
@@ -40,6 +45,7 @@ test('un match se saisit, se corrige, survit à un rechargement et se termine', 
   await expect(score).toHaveText('2 – 3')
   await page.getByRole('button', { name: '↶ Annuler' }).click()
   await expect(score).toHaveText('2 – 0')
+  await attendreGarde(page)
   await marquer(page, 'GRADIGNAN', '+2', 5)
   await expect(score).toHaveText('2 – 2')
 
@@ -47,10 +53,13 @@ test('un match se saisit, se corrige, survit à un rechargement et se termine', 
   await expect(score).toHaveText('2 – 2')
 
   await page.getByRole('button', { name: 'Fin de période' }).click()
+  await attendreGarde(page)
   await page.getByRole('button', { name: 'Passer à la 2ème mi-temps' }).click()
   await expect(page.getByText('2ème mi-temps', { exact: true })).toBeVisible()
+  await attendreGarde(page)
   await marquer(page, 'ST DELPHIN', '+1', 4)
   await page.getByRole('button', { name: 'Fin de période' }).click()
+  await attendreGarde(page)
   await page.getByRole('button', { name: 'Terminer le match' }).click()
   await expect(page.getByRole('heading', { name: 'Match terminé' })).toBeVisible()
   await expect(page.getByLabel('Score final')).toContainText('3 – 2')

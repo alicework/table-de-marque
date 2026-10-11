@@ -3,6 +3,7 @@ import type { EtatMatch } from '../../domain/etat'
 import { parNumero } from '../../domain/match'
 import { niveauFautesJoueur } from '../../domain/regles'
 import type { Match } from '../../domain/types'
+import type { Garder } from '../commun/gardeDoubleTap'
 import { pastillesFautes, pluriel } from '../format'
 import type { ActionEnAttente } from './types'
 
@@ -10,13 +11,15 @@ interface Props {
   match: Match
   etat: EtatMatch
   action: ActionEnAttente
+  garder: Garder
   /** joueurId null = coach (faute uniquement) */
   onChoisir: (joueurId: string | null) => void
   onAnnuler: () => void
 }
 
-export function ChoixJoueur({ match, etat, action, onChoisir, onAnnuler }: Props) {
+export function ChoixJoueur({ match, etat, action, garder, onChoisir, onAnnuler }: Props) {
   // Un double tap ne doit enregistrer qu'une action : le second clic arrive avant le re-rendu.
+  // La garde passe avant ce verrou : un tap qu'elle ignore ne doit pas condamner la tuile.
   const dejaChoisi = useRef(false)
   const choisir = (joueurId: string | null) => {
     if (dejaChoisi.current) return
@@ -46,7 +49,7 @@ export function ChoixJoueur({ match, etat, action, onChoisir, onAnnuler }: Props
               className={`tuile niveau-${niveau}`}
               disabled={action.type === 'panier' && niveau === 'exclu'}
               aria-label={`n°${joueur.numero}, ${pluriel(fautes, 'faute')}, ${pluriel(points, 'point')}`}
-              onClick={() => choisir(joueur.id)}
+              onClick={() => garder(choisir)(joueur.id)}
             >
               <span className="tuile-numero">{joueur.numero}</span>
               <span className="tuile-fautes">{pastillesFautes(fautes)}</span>
@@ -58,7 +61,7 @@ export function ChoixJoueur({ match, etat, action, onChoisir, onAnnuler }: Props
           <button
             className="tuile tuile-coach"
             aria-label={`Coach, ${pluriel(stats.fautesCoach, 'faute')}`}
-            onClick={() => choisir(null)}
+            onClick={() => garder(choisir)(null)}
           >
             <span className="tuile-numero">Coach</span>
             <span className="tuile-fautes">{'●'.repeat(stats.fautesCoach)}</span>

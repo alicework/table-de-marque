@@ -4,6 +4,7 @@ import type { EtatMatch } from '../../domain/etat'
 import { libellePeriode } from '../../domain/periodes'
 import type { Evenement, Match } from '../../domain/types'
 import { Dialogue } from '../commun/Dialogue'
+import type { Garder } from '../commun/gardeDoubleTap'
 import { decrireEvenement } from '../format'
 import type { Appliquer } from '../useMatch'
 import { EditionEvenement, type EvenementModifiable } from './EditionEvenement'
@@ -17,10 +18,11 @@ interface Props {
   match: Match
   etat: EtatMatch
   appliquer: Appliquer
+  garder: Garder
   onRetour: () => void
 }
 
-export function Journal({ match, etat, appliquer, onRetour }: Props) {
+export function Journal({ match, etat, appliquer, garder, onRetour }: Props) {
   const [edition, setEdition] = useState<EvenementModifiable | null>(null)
   const [suppression, setSuppression] = useState<EvenementModifiable | null>(null)
 
@@ -28,11 +30,15 @@ export function Journal({ match, etat, appliquer, onRetour }: Props) {
     <section className="ecran journal">
       <header className="entete">
         <h1>Journal</h1>
-        <button className="btn btn-principal" onClick={onRetour}>
+        <button className="btn btn-principal" onClick={garder(onRetour)}>
           Retour au match
         </button>
       </header>
-      <button className="btn" disabled={match.evenements.length === 0} onClick={() => void appliquer(annulerDernier)}>
+      <button
+        className="btn"
+        disabled={match.evenements.length === 0}
+        onClick={garder(() => void appliquer(annulerDernier))}
+      >
         ↶ Annuler la dernière action
       </button>
       <ol className="liste-journal" aria-label="Actions du match">
@@ -73,10 +79,10 @@ export function Journal({ match, etat, appliquer, onRetour }: Props) {
         <EditionEvenement
           match={match}
           evenement={edition}
-          onValider={(evenement) => {
+          onValider={garder((evenement: EvenementModifiable) => {
             void appliquer((m) => remplacerEvenement(m, evenement))
             setEdition(null)
-          }}
+          })}
           onAnnuler={() => setEdition(null)}
         />
       )}
@@ -87,11 +93,11 @@ export function Journal({ match, etat, appliquer, onRetour }: Props) {
             <>
               <button
                 className="btn btn-danger"
-                onClick={() => {
+                onClick={garder(() => {
                   const id = suppression.id
                   void appliquer((m) => supprimerEvenement(m, id))
                   setSuppression(null)
-                }}
+                })}
               >
                 Supprimer
               </button>

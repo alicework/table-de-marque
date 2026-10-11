@@ -1,8 +1,10 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { ajouterEvenement, annulerDernier, appliquerFinPeriode, rouvrirMatch } from '../../domain/commandes'
 import { calculerEtat } from '../../domain/etat'
+import type { ChoixFinPeriode } from '../../domain/periodes'
 import type { EquipeId, NouvelEvenement } from '../../domain/types'
 import { Dialogue } from '../commun/Dialogue'
+import { useGardeDoubleTap } from '../commun/gardeDoubleTap'
 import { Journal } from '../journal/Journal'
 import { useMatch } from '../useMatch'
 import { ChoixJoueur } from './ChoixJoueur'
@@ -13,9 +15,6 @@ import type { ActionEnAttente } from './types'
 
 type Vue = { nom: 'action' } | { nom: 'joueur'; action: ActionEnAttente } | { nom: 'finPeriode' } | { nom: 'journal' }
 
-// Après le choix d'un joueur, le second tap d'un double tap tombe sur l'écran d'action : on l'ignore.
-const DELAI_ANTI_DOUBLE_TAP_MS = 400
-
 interface Props {
   matchId: string
   onAccueil: () => void
@@ -24,7 +23,8 @@ interface Props {
 export function EcranMatch({ matchId, onAccueil }: Props) {
   const { match, appliquer, erreurStockage, effacerErreurStockage } = useMatch(matchId)
   const [vue, setVue] = useState<Vue>({ nom: 'action' })
-  const ignorerJusqua = useRef(0)
+  // Une seule garde pour toutes les vues : le second tap d'un double tap tombe souvent sur l'écran suivant.
+  const garder = useGardeDoubleTap()
 
   if (!match) return <p className="chargement">Chargement…</p>
 
@@ -33,19 +33,18 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
     void appliquer((m) => ajouterEvenement(m, evenement))
   }
   const retourAction = () => setVue({ nom: 'action' })
-  const siPasDoubleTap =
-    <Args extends unknown[]>(fn: (...args: Args) => void) =>
-    (...args: Args) => {
-      if (Date.now() < ignorerJusqua.current) return
-      fn(...args)
-    }
 
   let contenu: ReactNode
   if (vue.nom === 'journal') {
-    contenu = <Journal match={match} etat={etat} appliquer={appliquer} onRetour={retourAction} />
+    contenu = <Journal match={match} etat={etat} appliquer={appliquer} garder={garder} onRetour={retourAction} />
   } else if (etat.termine) {
     contenu = (
-      <MatchTermine match={match} etat={etat} onRouvrir={() => void appliquer(rouvrirMatch)} onAccueil={onAccueil} />
+      <MatchTermine
+        match={match}
+        etat={etat}
+        onRouvrir={garder(() => void appliquer(rouvrirMatch))}
+        onAccueil={onAccueil}
+      />
     )
   } else if (vue.nom === 'joueur') {
     const action = vue.action
@@ -54,8 +53,8 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
         match={match}
         etat={etat}
         action={action}
+        garder={garder}
         onChoisir={(joueurId) => {
-          ignorerJusqua.current = Date.now() + DELAI_ANTI_DOUBLE_TAP_MS
           if (action.type === 'faute') {
             enregistrer({ type: 'faute', equipe: action.equipe, joueurId })
           } else if (joueurId !== null) {
@@ -63,7 +62,7 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
           }
           retourAction()
         }}
-        onAnnuler={retourAction}
+        onAnnuler={garder(retourAction)}
       />
     )
   } else {
@@ -72,21 +71,21 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
         <EcranAction
           match={match}
           etat={etat}
-          onAction={siPasDoubleTap((action: ActionEnAttente) => setVue({ nom: 'joueur', action }))}
-          onTempsMort={siPasDoubleTap((equipe: EquipeId) => enregistrer({ type: 'tempsMort', equipe }))}
-          onAnnulerDernier={siPasDoubleTap(() => void appliquer(annulerDernier))}
-          onFinPeriode={siPasDoubleTap(() => setVue({ nom: 'finPeriode' }))}
-          onJournal={siPasDoubleTap(() => setVue({ nom: 'journal' }))}
+          onAction={garder((action: ActionEnAttente) => setVue({ nom: 'joueur', action }))}
+          onTempsMort={garder((equipe: EquipeId) => enregistrer({ type: 'tempsMort', equipe }))}
+          onAnnulerDernier={garder(() => void appliquer(annulerDernier))}
+          onFinPeriode={garder(() => setVue({ nom: 'finPeriode' }))}
+          onJournal={garder(() => setVue({ nom: 'journal' }))}
           onAccueil={onAccueil}
         />
         {vue.nom === 'finPeriode' && (
           <FinPeriode
             etat={etat}
-            onChoix={(choix) => {
+            onChoix={garder((choix: ChoixFinPeriode) => {
               void appliquer((m) => appliquerFinPeriode(m, choix))
               retourAction()
-            }}
-            onAnnuler={retourAction}
+            })}
+            onAnnuler={garder(retourAction)}
           />
         )}
       </>

@@ -1,9 +1,11 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { NouvelEvenement } from '../../domain/types'
+import { db } from '../../storage/db'
 import { enregistrerMatch, lireMatch } from '../../storage/matchs'
 import { faute, matchDeTest, panier } from '../../test/fixtures'
+import { GARDE_DOUBLE_TAP } from '../commun/gardeDoubleTap'
 import { EcranMatch } from './EcranMatch'
 
 async function afficher(...evenements: NouvelEvenement[]) {
@@ -75,17 +77,6 @@ describe('EcranMatch — saisie', () => {
     expect((await lireMatch(id))?.evenements).toHaveLength(1)
   })
 
-  it('un tap fantôme sur l’écran d’action juste après un choix est ignoré', async () => {
-    const { user, id } = await afficher()
-    await user.click(actions('ST DELPHIN').getByRole('button', { name: '+2' }))
-    await user.click(screen.getByRole('button', { name: /^n°7,/ }))
-    await user.click(screen.getByRole('button', { name: '↶ Annuler' }))
-    await user.click(actions('ST DELPHIN').getByRole('button', { name: '+3' }))
-    await attendreScore('2 – 0')
-    expect(screen.queryByRole('heading', { name: '+3 — ST DELPHIN' })).not.toBeInTheDocument()
-    expect((await lireMatch(id))?.evenements).toHaveLength(1)
-  })
-
   it('compte un temps mort et annule la dernière action', async () => {
     const { user } = await afficher()
     await user.click(actions('ST DELPHIN').getByRole('button', { name: 'Temps mort' }))
@@ -145,5 +136,83 @@ describe('EcranMatch — périodes et alertes', () => {
   it('alerte quand un joueur a 5 fautes', async () => {
     await afficher(...Array.from({ length: 5 }, () => faute('B', 'b8')))
     expect(screen.getByText('GRADIGNAN : n°8 a 5 fautes, doit sortir')).toBeInTheDocument()
+  })
+})
+
+describe('garde anti-double-tap', () => {
+  // Horloge figée : seul un avancement explicite rouvre la garde.
+  let horloge = 1000
+  const avancer = (ms: number) => {
+    horloge += ms
+  }
+
+  beforeEach(() => {
+    horloge = 1000
+    GARDE_DOUBLE_TAP.delaiMs = 300
+    GARDE_DOUBLE_TAP.maintenant = () => horloge
+  })
+
+  // Une action acceptée plus tard passe par la même file que les précédentes : une fois affichée,
+  // tout ce qui a été accepté avant est enregistré.
+  async function synchroniser(user: ReturnType<typeof userEvent.setup>) {
+    avancer(301)
+    await user.click(actions('GRADIGNAN').getByRole('button', { name: 'Temps mort' }))
+    await waitFor(() => expect(screen.getByLabelText('Temps morts GRADIGNAN')).toHaveTextContent('TM 1'))
+  }
+
+  it('un double tap sur « ↶ Annuler » ne supprime qu’une action', async () => {
+    const { user, id } = await afficher(panier('A', 'a7', 2), panier('B', 'b8', 3))
+    await user.dblClick(screen.getByRole('button', { name: '↶ Annuler' }))
+    await synchroniser(user)
+    expect(screen.getByLabelText('Score')).toHaveTextContent('2 – 0')
+    expect((await lireMatch(id))?.evenements).toMatchObject([{ type: 'panier' }, { type: 'tempsMort' }])
+  })
+
+  it('un double tap sur « Temps mort » n’en compte qu’un', async () => {
+    const { user, id } = await afficher()
+    await user.dblClick(actions('ST DELPHIN').getByRole('button', { name: 'Temps mort' }))
+    await synchroniser(user)
+    expect(screen.getByLabelText('Temps morts ST DELPHIN')).toHaveTextContent('TM 1')
+    expect((await lireMatch(id))?.evenements).toHaveLength(2)
+  })
+
+  it('le second tap d’un double tap sur « +2 » ne choisit pas la tuile apparue sous le doigt', async () => {
+    const { user, id } = await afficher()
+    await user.click(actions('ST DELPHIN').getByRole('button', { name: '+2' }))
+    await user.click(screen.getByRole('button', { name: /^n°7,/ }))
+    expect(screen.getByRole('heading', { name: '+2 — ST DELPHIN' })).toBeInTheDocument()
+
+    avancer(301)
+    await user.click(screen.getByRole('button', { name: /^n°7,/ }))
+    await attendreScore('2 – 0')
+    expect((await lireMatch(id))?.evenements).toHaveLength(1)
+  })
+
+  it('un tap fantôme sur l’écran d’action juste après un choix est ignoré', async () => {
+    const { user, id } = await afficher()
+    await user.click(actions('ST DELPHIN').getByRole('button', { name: '+2' }))
+    avancer(301)
+    await user.click(screen.getByRole('button', { name: /^n°7,/ }))
+    await user.click(screen.getByRole('button', { name: '↶ Annuler' }))
+    await user.click(actions('ST DELPHIN').getByRole('button', { name: '+3' }))
+    expect(screen.queryByRole('heading', { name: '+3 — ST DELPHIN' })).not.toBeInTheDocument()
+    await synchroniser(user)
+    expect(screen.getByLabelText('Score')).toHaveTextContent('2 – 0')
+    expect((await lireMatch(id))?.evenements).toMatchObject([{ type: 'panier' }, { type: 'tempsMort' }])
+  })
+
+  it('« Terminer le match » puis un tap immédiat sur « Rouvrir pour corriger » laisse le match terminé', async () => {
+    const { user, id } = await afficher({ type: 'debutPeriode', periode: 'MT2' }, panier('A', 'a7', 3))
+    await user.click(screen.getByRole('button', { name: 'Fin de période' }))
+    avancer(301)
+    await user.click(screen.getByRole('button', { name: 'Terminer le match' }))
+    expect(await screen.findByRole('heading', { name: 'Match terminé' })).toBeInTheDocument()
+
+    // Rouvrir commencerait par relire le match : aucune lecture ne doit partir.
+    const lecture = vi.spyOn(db.matchs, 'get')
+    await user.click(screen.getByRole('button', { name: 'Rouvrir pour corriger' }))
+    expect(lecture).not.toHaveBeenCalled()
+    expect(screen.getByRole('heading', { name: 'Match terminé' })).toBeInTheDocument()
+    expect((await lireMatch(id))?.statut).toBe('termine')
   })
 })

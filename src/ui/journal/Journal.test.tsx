@@ -2,8 +2,9 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { NouvelEvenement } from '../../domain/types'
-import { enregistrerMatch } from '../../storage/matchs'
+import { enregistrerMatch, matchEnCours } from '../../storage/matchs'
 import { matchDeTest, panier } from '../../test/fixtures'
+import { GARDE_DOUBLE_TAP } from '../commun/gardeDoubleTap'
 import { EcranMatch } from '../saisie/EcranMatch'
 
 async function ouvrirJournal(...evenements: NouvelEvenement[]) {
@@ -63,6 +64,25 @@ describe('Journal', () => {
     const user = await ouvrirJournal(panier('A', 'a7', 2), panier('B', 'b8', 3))
     await user.click(screen.getByRole('button', { name: '↶ Annuler la dernière action' }))
     await waitFor(() => expect(lignes()).toHaveLength(1))
+  })
+
+  it('un double tap sur « ↶ Annuler la dernière action » ne supprime qu’une action', async () => {
+    let horloge = 1000
+    GARDE_DOUBLE_TAP.delaiMs = 300
+    GARDE_DOUBLE_TAP.maintenant = () => horloge
+    const user = await ouvrirJournal(panier('A', 'a7', 2), panier('B', 'b8', 3))
+    horloge += 301
+    await user.dblClick(screen.getByRole('button', { name: '↶ Annuler la dernière action' }))
+
+    // Un temps mort accepté plus tard passe par la même file : une fois affiché, l'annulation est enregistrée.
+    horloge += 301
+    await user.click(screen.getByRole('button', { name: 'Retour au match' }))
+    horloge += 301
+    const actionsB = within(screen.getByRole('group', { name: 'Actions GRADIGNAN' }))
+    await user.click(actionsB.getByRole('button', { name: 'Temps mort' }))
+    await waitFor(() => expect(screen.getByLabelText('Temps morts GRADIGNAN')).toHaveTextContent('TM 1'))
+    expect(screen.getByLabelText('Score')).toHaveTextContent('2 – 0')
+    expect((await matchEnCours())?.evenements).toHaveLength(2)
   })
 
   it('refuse de changer un n° vers un n° déjà pris', async () => {
