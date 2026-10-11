@@ -14,10 +14,20 @@ async function executer(
   operation: Operation,
   signalerErreurStockage: (message: string) => void,
 ): Promise<string | null> {
+  // Un échec de lecture (ou un match disparu) est un échec de stockage : alerte bloquante, jamais silencieux.
+  let courant: Match | undefined
+  try {
+    courant = await lireMatch(matchId)
+  } catch {
+    courant = undefined
+  }
+  if (!courant) {
+    signalerErreurStockage(MESSAGE_ERREUR_STOCKAGE)
+    return MESSAGE_ERREUR_STOCKAGE
+  }
+  // Seule l'exception levée par l'opération est une erreur métier.
   let suivant: Match
   try {
-    const courant = await lireMatch(matchId)
-    if (!courant) return 'Match introuvable.'
     suivant = operation(courant)
   } catch (erreur) {
     return erreur instanceof Error ? erreur.message : String(erreur)

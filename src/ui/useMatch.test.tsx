@@ -59,4 +59,25 @@ describe('useMatch', () => {
     expect(retour).toBe(MESSAGE_ERREUR_STOCKAGE)
     expect(result.current.erreurStockage).toBe(MESSAGE_ERREUR_STOCKAGE)
   })
+
+  it('signale un échec de lecture', async () => {
+    const { result } = await monter()
+    vi.spyOn(db.matchs, 'get').mockRejectedValueOnce(new Error('UnknownError'))
+    let retour: string | null = null
+    await act(async () => {
+      retour = await result.current.appliquer((m) => ajouterEvenement(m, panier('A', 'a7', 2)))
+    })
+    expect(retour).toBe(MESSAGE_ERREUR_STOCKAGE)
+    expect(result.current.erreurStockage).toBe(MESSAGE_ERREUR_STOCKAGE)
+  })
+
+  it('signale un match introuvable comme un échec de stockage', async () => {
+    const rendu = renderHook(() => useMatch('inconnu'))
+    let retour: string | null = null
+    await act(async () => {
+      retour = await rendu.result.current.appliquer((m) => ajouterEvenement(m, panier('A', 'a7', 2)))
+    })
+    expect(retour).toBe(MESSAGE_ERREUR_STOCKAGE)
+    expect(rendu.result.current.erreurStockage).toBe(MESSAGE_ERREUR_STOCKAGE)
+  })
 })
