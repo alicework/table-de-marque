@@ -1,5 +1,8 @@
 .superpowers/
 
+# Règlement UFOLEP : contient des données personnelles, ne jamais le versionner.
+Reglement*.pdf
+
 # Logs
 logs
 *.log
