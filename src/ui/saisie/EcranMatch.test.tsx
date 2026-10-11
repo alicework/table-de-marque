@@ -99,3 +99,51 @@ describe('EcranMatch — saisie', () => {
     expect(screen.getByLabelText("Fautes d'équipe GRADIGNAN")).toHaveTextContent('Fautes éq. 2/8')
   })
 })
+
+describe('EcranMatch — périodes et alertes', () => {
+  it('passe à la 2ème mi-temps après confirmation', async () => {
+    const { user } = await afficher(panier('A', 'a7', 2))
+    await user.click(screen.getByRole('button', { name: 'Fin de période' }))
+    const dialogue = screen.getByRole('dialog', { name: 'Fin de la 1ère mi-temps ?' })
+    await user.click(within(dialogue).getByRole('button', { name: 'Passer à la 2ème mi-temps' }))
+    expect(await screen.findByText('2ème mi-temps')).toBeInTheDocument()
+  })
+
+  it('annuler la fin de période ne change rien', async () => {
+    const { user, id } = await afficher()
+    await user.click(screen.getByRole('button', { name: 'Fin de période' }))
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect((await lireMatch(id))?.evenements).toHaveLength(0)
+  })
+
+  it('propose une prolongation en cas d’égalité', async () => {
+    const { user } = await afficher({ type: 'debutPeriode', periode: 'MT2' }, panier('A', 'a7', 2), panier('B', 'b8', 2))
+    await user.click(screen.getByRole('button', { name: 'Fin de période' }))
+    expect(screen.getByRole('button', { name: 'Terminer le match' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Jouer une prolongation' }))
+    expect(await screen.findByText('Prolongation')).toBeInTheDocument()
+  })
+
+  it('termine le match puis permet de le rouvrir', async () => {
+    const { user } = await afficher({ type: 'debutPeriode', periode: 'MT2' }, panier('A', 'a7', 3))
+    await user.click(screen.getByRole('button', { name: 'Fin de période' }))
+    expect(screen.queryByRole('button', { name: 'Jouer une prolongation' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Terminer le match' }))
+    expect(await screen.findByRole('heading', { name: 'Match terminé' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Score final')).toHaveTextContent('ST DELPHIN 3 – 0 GRADIGNAN')
+    await user.click(screen.getByRole('button', { name: 'Rouvrir pour corriger' }))
+    await attendreScore('3 – 0')
+  })
+
+  it('alerte à 8 fautes d’équipe et colore le compteur', async () => {
+    await afficher(...Array.from({ length: 8 }, (_, i) => faute('A', ['a4', 'a7', 'a9', 'a11'][i % 4])))
+    expect(screen.getByText("ST DELPHIN : 8 fautes d'équipe — au-delà de 8, 2 lancers francs")).toBeInTheDocument()
+    expect(screen.getByLabelText("Fautes d'équipe ST DELPHIN")).toHaveClass('niveau-limite')
+  })
+
+  it('alerte quand un joueur a 5 fautes', async () => {
+    await afficher(...Array.from({ length: 5 }, () => faute('B', 'b8')))
+    expect(screen.getByText('GRADIGNAN : n°8 a 5 fautes, doit sortir')).toBeInTheDocument()
+  })
+})

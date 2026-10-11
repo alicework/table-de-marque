@@ -1,6 +1,8 @@
 import type { EtatMatch } from '../../domain/etat'
+import { alertesActives } from '../../domain/regles'
 import { EQUIPES, type EquipeId, type Match } from '../../domain/types'
 import { decrireEvenement } from '../format'
+import { Alertes } from './Alertes'
 import { Bandeau } from './Bandeau'
 import type { ActionEnAttente } from './types'
 
@@ -10,16 +12,26 @@ interface Props {
   onAction: (action: ActionEnAttente) => void
   onTempsMort: (equipe: EquipeId) => void
   onAnnulerDernier: () => void
+  onFinPeriode: () => void
   onAccueil: () => void
 }
 
 const VALEURS = [1, 2, 3] as const
 
-export function EcranAction({ match, etat, onAction, onTempsMort, onAnnulerDernier, onAccueil }: Props) {
+export function EcranAction({
+  match,
+  etat,
+  onAction,
+  onTempsMort,
+  onAnnulerDernier,
+  onFinPeriode,
+  onAccueil,
+}: Props) {
   const derniere = etat.chronologie.at(-1)
   return (
     <section className="ecran ecran-action">
       <Bandeau match={match} etat={etat} />
+      <Alertes alertes={alertesActives(match, etat)} />
       <div className="blocs-equipes">
         {EQUIPES.map((equipe) => (
           <div
@@ -61,6 +73,9 @@ export function EcranAction({ match, etat, onAction, onTempsMort, onAnnulerDerni
       <nav className="barre-basse">
         <button className="btn btn-discret" disabled={match.evenements.length === 0} onClick={onAnnulerDernier}>
           ↶ Annuler
+        </button>
+        <button className="btn" onClick={onFinPeriode}>
+          Fin de période
         </button>
         <button className="btn btn-discret" onClick={onAccueil}>
           Accueil
