@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { brouillonVersEquipe, brouillonVide, lireNumero, type BrouillonEquipe } from './brouillon'
+import { CLUB_TEST, LICENCIES_TEST } from '../../test/fixturesClubs'
+import {
+  appliquerSelection,
+  brouillonVersEquipe,
+  brouillonVide,
+  choisirClub,
+  joueurBrouillonVide,
+  lireNumero,
+  type BrouillonEquipe,
+} from './brouillon'
 
 describe('lireNumero', () => {
   it('accepte 0 à 99, zéro initial compris', () => {
@@ -21,8 +30,8 @@ describe('brouillonVersEquipe', () => {
     ...brouillonVide(),
     nom: ' ST DELPHIN ',
     joueurs: [
-      { id: 'x', numero: '7', nom: ' Durand ', prenom: 'Chloé', licence: '033_1', civilite: 'Mme' },
-      { id: 'vide', numero: '', nom: '', prenom: '', licence: '', civilite: null },
+      { id: 'x', licencieId: null, numero: '7', nom: ' Durand ', prenom: 'Chloé', licence: '033_1', civilite: 'Mme' },
+      { id: 'vide', licencieId: null, numero: '', nom: '', prenom: '', licence: '', civilite: null },
     ],
   }
 
@@ -52,5 +61,48 @@ describe('brouillonVersEquipe', () => {
     expect(brouillonVersEquipe(retire).coach).toBeNull()
     const ligneVidee = { ...brouillon, modeCoach: 'joueur' as const, coachJoueurId: 'vide' }
     expect(brouillonVersEquipe(ligneVidee).coach).toBeNull()
+  })
+})
+
+describe('sélection dans le pool', () => {
+  const [martin, durand, petit] = LICENCIES_TEST
+
+  it('pré-remplit le nom et la couleur depuis le club sans écraser une saisie', () => {
+    expect(choisirClub(brouillonVide(), CLUB_TEST)).toMatchObject({
+      clubId: 'club-sd',
+      nom: 'SAINT DELPHIN BASKET',
+      couleur: 'Vert',
+    })
+    expect(choisirClub({ ...brouillonVide(), nom: 'SD 2' }, CLUB_TEST).nom).toBe('SD 2')
+    expect(choisirClub(choisirClub(brouillonVide(), CLUB_TEST), null).clubId).toBeNull()
+  })
+
+  it('ajoute une ligne par licencié choisi et retire la ligne vide de départ', () => {
+    const b = appliquerSelection(brouillonVide(), LICENCIES_TEST, new Set([martin.id, petit.id]))
+    expect(b.joueurs.map((j) => [j.licencieId, j.nom, j.prenom, j.licence, j.civilite, j.numero])).toEqual([
+      ['lic-martin', 'Martin', 'Chloé', '033_00000101', 'Mme', ''],
+      ['lic-petit', 'Petit', 'Hugo', '033_00000103', 'M', ''],
+    ])
+  })
+
+  it('garde les n° déjà saisis et les lignes saisies à la main', () => {
+    let b = appliquerSelection(brouillonVide(), LICENCIES_TEST, new Set([martin.id]))
+    b = { ...b, joueurs: [...b.joueurs.map((j) => ({ ...j, numero: '7' })), { ...joueurBrouillonVide(), nom: 'Essai', numero: '30' }] }
+    b = appliquerSelection(b, LICENCIES_TEST, new Set([martin.id, durand.id]))
+    expect(b.joueurs.map((j) => [j.nom, j.numero])).toEqual([
+      ['Martin', '7'],
+      ['Essai', '30'],
+      ['Durand', ''],
+    ])
+  })
+
+  it('décocher retire la ligne, garde les autres n° et remet le coach à « aucun »', () => {
+    let b = appliquerSelection(brouillonVide(), LICENCIES_TEST, new Set([martin.id, durand.id]))
+    b = { ...b, joueurs: b.joueurs.map((j, i) => ({ ...j, numero: String(4 + i) })) }
+    const idLigneDurand = b.joueurs.find((j) => j.licencieId === durand.id)!.id
+    b = { ...b, modeCoach: 'joueur', coachJoueurId: idLigneDurand }
+    b = appliquerSelection(b, LICENCIES_TEST, new Set([martin.id]))
+    expect(b.joueurs.map((j) => [j.nom, j.numero])).toEqual([['Martin', '4']])
+    expect(brouillonVersEquipe({ ...b, nom: 'SD' }).coach).toBeNull()
   })
 })

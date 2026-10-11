@@ -1,12 +1,18 @@
+import { useLiveQuery } from 'dexie-react-hooks'
+import { useState } from 'react'
 import { REGLES } from '../../domain/config'
 import { verifierEquipe } from '../../domain/equipe'
 import type { Civilite } from '../../domain/types'
+import { listerClubs } from '../../storage/clubs'
 import {
+  appliquerSelection,
   brouillonVersEquipe,
+  choisirClub,
   joueurBrouillonVide,
   type BrouillonEquipe,
   type JoueurBrouillon,
 } from './brouillon'
+import { DialogueSelection } from './DialogueSelection'
 
 interface Props {
   titre: string
@@ -21,6 +27,8 @@ function libelleJoueur(joueur: JoueurBrouillon, index: number): string {
 }
 
 export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Props) {
+  const clubs = useLiveQuery(() => listerClubs(), [])
+  const [selection, setSelection] = useState(false)
   const maj = (modification: Partial<BrouillonEquipe>) => onChange({ ...valeur, ...modification })
   const majJoueur = (id: string, modification: Partial<JoueurBrouillon>) =>
     maj({ joueurs: valeur.joueurs.map((j) => (j.id === id ? { ...j, ...modification } : j)) })
@@ -32,6 +40,25 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
   return (
     <fieldset className="editeur-equipe">
       <legend>{titre}</legend>
+      <label>
+        Club
+        <select
+          value={valeur.clubId ?? ''}
+          onChange={(e) => onChange(choisirClub(valeur, clubs?.find((club) => club.id === e.target.value) ?? null))}
+        >
+          <option value="">Saisie libre</option>
+          {clubs?.map((club) => (
+            <option key={club.id} value={club.id}>
+              {club.nom}
+            </option>
+          ))}
+        </select>
+      </label>
+      <div className="actions-equipe">
+        <button type="button" className="btn" disabled={!valeur.clubId} onClick={() => setSelection(true)}>
+          Choisir les joueurs du club
+        </button>
+      </div>
       <label>
         Nom de l'équipe
         <input value={valeur.nom} onChange={(e) => maj({ nom: e.target.value })} />
@@ -160,6 +187,18 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
             <li key={message}>{message}</li>
           ))}
         </ul>
+      )}
+
+      {selection && valeur.clubId && (
+        <DialogueSelection
+          clubId={valeur.clubId}
+          brouillon={valeur}
+          onValider={(licencies, ids) => {
+            onChange(appliquerSelection(valeur, licencies, ids))
+            setSelection(false)
+          }}
+          onFermer={() => setSelection(false)}
+        />
       )}
     </fieldset>
   )

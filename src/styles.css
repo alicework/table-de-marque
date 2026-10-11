@@ -516,3 +516,28 @@ label {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+.liste-selection {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 50dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.case {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  color: var(--texte);
+  min-height: 44px;
+}
+
+.case input {
+  width: 22px;
+  height: 22px;
+  min-height: 0;
+}

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { db } from '../../storage/db'
 import { lireMatch } from '../../storage/matchs'
+import { creerClubDeTest } from '../../test/fixturesClubs'
 import { remplirEquipe } from '../../test/remplirEquipe'
 import { PreparationMatch } from './PreparationMatch'
 
@@ -97,5 +98,41 @@ describe('PreparationMatch', () => {
 
     await waitFor(() => expect(onDemarre).toHaveBeenCalledTimes(1))
     expect(await db.matchs.count()).toBe(1)
+  })
+
+  it("compose une équipe en choisissant dans le pool d'un club", async () => {
+    await creerClubDeTest()
+    const user = userEvent.setup()
+    const onDemarre = vi.fn()
+    render(<PreparationMatch onDemarre={onDemarre} onRetour={vi.fn()} />)
+
+    const groupeA = within(screen.getByRole('group', { name: 'Équipe A' }))
+    await user.selectOptions(await groupeA.findByLabelText('Club'), await groupeA.findByRole('option', { name: 'SAINT DELPHIN BASKET' }))
+    expect(groupeA.getByLabelText("Nom de l'équipe")).toHaveValue('SAINT DELPHIN BASKET')
+    expect(groupeA.getByLabelText('Couleur')).toHaveValue('Vert')
+
+    await user.click(groupeA.getByRole('button', { name: 'Choisir les joueurs du club' }))
+    const dialogue = within(screen.getByRole('dialog', { name: 'Choisir les joueurs' }))
+    await user.type(dialogue.getByLabelText('Rechercher'), 'dur')
+    expect(dialogue.queryByRole('checkbox', { name: /Martin/ })).not.toBeInTheDocument()
+    await user.click(await dialogue.findByRole('checkbox', { name: /Léa Durand/ }))
+    await user.clear(dialogue.getByLabelText('Rechercher'))
+    await user.click(dialogue.getByRole('checkbox', { name: /Chloé Martin/ }))
+    expect(dialogue.getByText('2 / 14 joueurs')).toBeInTheDocument()
+    await user.click(dialogue.getByRole('button', { name: 'Valider' }))
+
+    expect(groupeA.getByLabelText('Nom joueur 1')).toHaveValue('Durand')
+    expect(groupeA.getByLabelText('Nom joueur 2')).toHaveValue('Martin')
+    await user.type(groupeA.getByLabelText('N° joueur 1'), '4')
+    await user.type(groupeA.getByLabelText('N° joueur 2'), '7')
+    await remplirEquipe(user, 'Équipe B', 'GRADIGNAN', EQUIPE_B)
+    await user.click(screen.getByRole('button', { name: 'Commencer le match' }))
+
+    await waitFor(() => expect(onDemarre).toHaveBeenCalledTimes(1))
+    const match = await lireMatch(onDemarre.mock.calls[0][0])
+    expect(match?.equipes.A.joueurs.map((j) => [j.numero, j.licence])).toEqual([
+      [4, '033_00000102'],
+      [7, '033_00000101'],
+    ])
   })
 })
