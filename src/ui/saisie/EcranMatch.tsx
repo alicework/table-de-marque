@@ -3,6 +3,7 @@ import { ajouterEvenement, annulerDernier, appliquerFinPeriode, rouvrirMatch } f
 import { calculerEtat } from '../../domain/etat'
 import type { EquipeId, NouvelEvenement } from '../../domain/types'
 import { Dialogue } from '../commun/Dialogue'
+import { Journal } from '../journal/Journal'
 import { useMatch } from '../useMatch'
 import { ChoixJoueur } from './ChoixJoueur'
 import { EcranAction } from './EcranAction'
@@ -10,7 +11,7 @@ import { FinPeriode } from './FinPeriode'
 import { MatchTermine } from './MatchTermine'
 import type { ActionEnAttente } from './types'
 
-type Vue = { nom: 'action' } | { nom: 'joueur'; action: ActionEnAttente } | { nom: 'finPeriode' }
+type Vue = { nom: 'action' } | { nom: 'joueur'; action: ActionEnAttente } | { nom: 'finPeriode' } | { nom: 'journal' }
 
 // Après le choix d'un joueur, le second tap d'un double tap tombe sur l'écran d'action : on l'ignore.
 const DELAI_ANTI_DOUBLE_TAP_MS = 400
@@ -40,7 +41,9 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
     }
 
   let contenu: ReactNode
-  if (etat.termine) {
+  if (vue.nom === 'journal') {
+    contenu = <Journal match={match} etat={etat} appliquer={appliquer} onRetour={retourAction} />
+  } else if (etat.termine) {
     contenu = (
       <MatchTermine match={match} etat={etat} onRouvrir={() => void appliquer(rouvrirMatch)} onAccueil={onAccueil} />
     )
@@ -73,6 +76,7 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
           onTempsMort={siPasDoubleTap((equipe: EquipeId) => enregistrer({ type: 'tempsMort', equipe }))}
           onAnnulerDernier={siPasDoubleTap(() => void appliquer(annulerDernier))}
           onFinPeriode={siPasDoubleTap(() => setVue({ nom: 'finPeriode' }))}
+          onJournal={siPasDoubleTap(() => setVue({ nom: 'journal' }))}
           onAccueil={onAccueil}
         />
         {vue.nom === 'finPeriode' && (

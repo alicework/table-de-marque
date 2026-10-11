@@ -13,6 +13,7 @@ interface Props {
   onTempsMort: (equipe: EquipeId) => void
   onAnnulerDernier: () => void
   onFinPeriode: () => void
+  onJournal: () => void
   onAccueil: () => void
 }
 
@@ -25,6 +26,7 @@ export function EcranAction({
   onTempsMort,
   onAnnulerDernier,
   onFinPeriode,
+  onJournal,
   onAccueil,
 }: Props) {
   const derniere = etat.chronologie.at(-1)
@@ -73,6 +75,9 @@ export function EcranAction({
       <nav className="barre-basse">
         <button className="btn btn-discret" disabled={match.evenements.length === 0} onClick={onAnnulerDernier}>
           ↶ Annuler
+        </button>
+        <button className="btn btn-discret" onClick={onJournal}>
+          Journal
         </button>
         <button className="btn" onClick={onFinPeriode}>
           Fin de période
