@@ -7,11 +7,14 @@
   --texte-2: #a9a9b6;
   --equipe-a: #ff7b7b;
   --equipe-b: #74b9ff;
-  --points: #2e8b57;
-  --faute: #c0612b;
+  /* Fonds sous texte clair : contraste ≥ 4,5:1 avec --texte (WCAG AA). */
+  --points: #26784a;
+  --faute: #a65229;
   --temps-mort: #55557a;
   --attention: #f5c04a;
-  --danger: #e5484d;
+  --danger: #c8262c;
+  /* Rouge clair pour du texte sur --surface ou --fond : contraste ≥ 4,5:1. */
+  --danger-texte: #ff7b7f;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   background: var(--fond);
   color: var(--texte);
@@ -100,8 +103,16 @@ label {
   cursor: not-allowed;
 }
 
+/* Retour visuel immédiat au toucher. */
+.btn:active:not(:disabled),
+.btn-action:active:not(:disabled),
+.tuile:active:not(:disabled) {
+  filter: brightness(1.25);
+  transform: scale(0.97);
+}
+
 .erreurs {
-  color: var(--danger);
+  color: var(--danger-texte);
 }
 
 .avertissements {
@@ -206,7 +217,7 @@ label {
 }
 
 .fautes-equipe.niveau-limite {
-  color: var(--danger);
+  color: var(--danger-texte);
   font-weight: 800;
 }
 
