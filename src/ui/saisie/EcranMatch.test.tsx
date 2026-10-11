@@ -75,6 +75,17 @@ describe('EcranMatch — saisie', () => {
     expect((await lireMatch(id))?.evenements).toHaveLength(1)
   })
 
+  it('un tap fantôme sur l’écran d’action juste après un choix est ignoré', async () => {
+    const { user, id } = await afficher()
+    await user.click(actions('ST DELPHIN').getByRole('button', { name: '+2' }))
+    await user.click(screen.getByRole('button', { name: /^n°7,/ }))
+    await user.click(screen.getByRole('button', { name: '↶ Annuler' }))
+    await user.click(actions('ST DELPHIN').getByRole('button', { name: '+3' }))
+    await attendreScore('2 – 0')
+    expect(screen.queryByRole('heading', { name: '+3 — ST DELPHIN' })).not.toBeInTheDocument()
+    expect((await lireMatch(id))?.evenements).toHaveLength(1)
+  })
+
   it('compte un temps mort et annule la dernière action', async () => {
     const { user } = await afficher()
     await user.click(actions('ST DELPHIN').getByRole('button', { name: 'Temps mort' }))

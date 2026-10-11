@@ -1,7 +1,7 @@
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { ajouterEvenement, annulerDernier } from '../../domain/commandes'
 import { calculerEtat } from '../../domain/etat'
-import type { NouvelEvenement } from '../../domain/types'
+import type { EquipeId, NouvelEvenement } from '../../domain/types'
 import { Dialogue } from '../commun/Dialogue'
 import { useMatch } from '../useMatch'
 import { ChoixJoueur } from './ChoixJoueur'
@@ -9,6 +9,9 @@ import { EcranAction } from './EcranAction'
 import type { ActionEnAttente } from './types'
 
 type Vue = { nom: 'action' } | { nom: 'joueur'; action: ActionEnAttente }
+
+// Après le choix d'un joueur, le second tap d'un double tap tombe sur l'écran d'action : on l'ignore.
+const DELAI_ANTI_DOUBLE_TAP_MS = 400
 
 interface Props {
   matchId: string
@@ -18,6 +21,7 @@ interface Props {
 export function EcranMatch({ matchId, onAccueil }: Props) {
   const { match, appliquer, erreurStockage, effacerErreurStockage } = useMatch(matchId)
   const [vue, setVue] = useState<Vue>({ nom: 'action' })
+  const ignorerJusqua = useRef(0)
 
   if (!match) return <p className="chargement">Chargement…</p>
 
@@ -26,6 +30,12 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
     void appliquer((m) => ajouterEvenement(m, evenement))
   }
   const retourAction = () => setVue({ nom: 'action' })
+  const siPasDoubleTap =
+    <Args extends unknown[]>(fn: (...args: Args) => void) =>
+    (...args: Args) => {
+      if (Date.now() < ignorerJusqua.current) return
+      fn(...args)
+    }
 
   let contenu: ReactNode
   if (vue.nom === 'joueur') {
@@ -36,6 +46,7 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
         etat={etat}
         action={action}
         onChoisir={(joueurId) => {
+          ignorerJusqua.current = Date.now() + DELAI_ANTI_DOUBLE_TAP_MS
           if (action.type === 'faute') {
             enregistrer({ type: 'faute', equipe: action.equipe, joueurId })
           } else if (joueurId !== null) {
@@ -51,9 +62,9 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
       <EcranAction
         match={match}
         etat={etat}
-        onAction={(action) => setVue({ nom: 'joueur', action })}
-        onTempsMort={(equipe) => enregistrer({ type: 'tempsMort', equipe })}
-        onAnnulerDernier={() => void appliquer(annulerDernier)}
+        onAction={siPasDoubleTap((action: ActionEnAttente) => setVue({ nom: 'joueur', action }))}
+        onTempsMort={siPasDoubleTap((equipe: EquipeId) => enregistrer({ type: 'tempsMort', equipe }))}
+        onAnnulerDernier={siPasDoubleTap(() => void appliquer(annulerDernier))}
         onAccueil={onAccueil}
       />
     )
