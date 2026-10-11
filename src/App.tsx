@@ -1,6 +1,8 @@
+import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { matchEnCours } from './storage/matchs'
 import { Accueil } from './ui/Accueil'
+import { MiseAJour } from './ui/MiseAJour'
 import { PreparationMatch } from './ui/preparation/PreparationMatch'
 import { EcranMatch } from './ui/saisie/EcranMatch'
 
@@ -8,6 +10,8 @@ type Ecran = { nom: 'chargement' } | { nom: 'accueil' } | { nom: 'preparation' }
 
 export default function App() {
   const [ecran, setEcran] = useState<Ecran>({ nom: 'chargement' })
+  const enCours = useLiveQuery(() => matchEnCours(), [])
+  const miseAJourAutorisee = ecran.nom !== 'match' && ecran.nom !== 'chargement' && !enCours
 
   useEffect(() => {
     let actif = true
@@ -34,6 +38,7 @@ export default function App() {
       )}
       {ecran.nom === 'preparation' && <PreparationMatch onDemarre={ouvrirMatch} onRetour={allerAccueil} />}
       {ecran.nom === 'match' && <EcranMatch key={ecran.matchId} matchId={ecran.matchId} onAccueil={allerAccueil} />}
+      <MiseAJour autorisee={miseAJourAutorisee} />
     </main>
   )
 }
