@@ -7,11 +7,13 @@ import { listerClubs } from '../../storage/clubs'
 import {
   appliquerSelection,
   brouillonVersEquipe,
+  brouillonVersPartage,
   choisirClub,
   joueurBrouillonVide,
   type BrouillonEquipe,
   type JoueurBrouillon,
 } from './brouillon'
+import { DialoguePartage } from '../partage/DialoguePartage'
 import { DialogueSelection } from './DialogueSelection'
 
 interface Props {
@@ -29,6 +31,7 @@ function libelleJoueur(joueur: JoueurBrouillon, index: number): string {
 export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Props) {
   const clubs = useLiveQuery(() => listerClubs(), [])
   const [selection, setSelection] = useState(false)
+  const [partage, setPartage] = useState(false)
   const maj = (modification: Partial<BrouillonEquipe>) => onChange({ ...valeur, ...modification })
   const majJoueur = (id: string, modification: Partial<JoueurBrouillon>) =>
     maj({ joueurs: valeur.joueurs.map((j) => (j.id === id ? { ...j, ...modification } : j)) })
@@ -36,6 +39,7 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
   const equipe = brouillonVersEquipe(valeur)
   const verification = verifierEquipe(equipe)
   const valeurCoach = valeur.modeCoach === 'joueur' ? valeur.coachJoueurId : valeur.modeCoach
+  const peutPartager = valeur.nom.trim() !== '' && equipe.joueurs.length > 0
 
   return (
     <fieldset className="editeur-equipe">
@@ -65,6 +69,9 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
       <div className="actions-equipe">
         <button type="button" className="btn" disabled={!valeur.clubId} onClick={() => setSelection(true)}>
           Choisir les joueurs du club
+        </button>
+        <button type="button" className="btn" disabled={!peutPartager} onClick={() => setPartage(true)}>
+          Partager cette équipe
         </button>
       </div>
       <label>
@@ -208,6 +215,7 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
           onFermer={() => setSelection(false)}
         />
       )}
+      {partage && <DialoguePartage equipe={brouillonVersPartage(valeur)} onFermer={() => setPartage(false)} />}
     </fieldset>
   )
 }

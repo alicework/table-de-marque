@@ -541,3 +541,15 @@ label {
   height: 22px;
   min-height: 0;
 }
+
+.qr {
+  display: grid;
+  place-items: center;
+}
+
+.qr svg {
+  width: min(80vw, 340px);
+  height: auto;
+  background: #fff;
+  border-radius: 8px;
+}

@@ -4,6 +4,7 @@ import { matchEnCours } from './storage/matchs'
 import { Accueil } from './ui/Accueil'
 import { EcranClubs } from './ui/clubs/EcranClubs'
 import { MiseAJour } from './ui/MiseAJour'
+import { EcranPartage } from './ui/partage/EcranPartage'
 import { PreparationMatch } from './ui/preparation/PreparationMatch'
 import { EcranMatch } from './ui/saisie/EcranMatch'
 
@@ -13,6 +14,7 @@ type Ecran =
   | { nom: 'preparation' }
   | { nom: 'match'; matchId: string }
   | { nom: 'clubs' }
+  | { nom: 'partage' }
 
 export default function App() {
   const [ecran, setEcran] = useState<Ecran>({ nom: 'chargement' })
@@ -45,11 +47,13 @@ export default function App() {
           onNouveauMatch={() => setEcran({ nom: 'preparation' })}
           onReprendre={ouvrirMatch}
           onClubs={() => setEcran({ nom: 'clubs' })}
+          onPartager={() => setEcran({ nom: 'partage' })}
         />
       )}
       {ecran.nom === 'preparation' && <PreparationMatch onDemarre={ouvrirMatch} onRetour={allerAccueil} />}
       {ecran.nom === 'match' && <EcranMatch key={ecran.matchId} matchId={ecran.matchId} onAccueil={allerAccueil} />}
       {ecran.nom === 'clubs' && <EcranClubs onRetour={allerAccueil} />}
+      {ecran.nom === 'partage' && <EcranPartage onRetour={allerAccueil} />}
       <MiseAJour autorisee={miseAJourAutorisee} />
     </main>
   )
