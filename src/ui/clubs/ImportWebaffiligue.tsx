@@ -11,7 +11,7 @@ type Etat =
   | { etape: 'termine'; bilans: BilanImportClub[] }
   | { etape: 'erreur'; message: string }
 
-export function decrireBilan(bilan: BilanImportClub): string {
+function decrireBilan(bilan: BilanImportClub): string {
   const s = (n: number, marque: string) => (n > 1 ? marque : '')
   return (
     `${bilan.nom}${bilan.nouveauClub ? ' (nouveau club)' : ''} : ` +
