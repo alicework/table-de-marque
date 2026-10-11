@@ -146,6 +146,17 @@ describe('équipe reçue par lien', () => {
     expect(await screen.findByRole('heading', { name: 'Équipe reçue' })).toBeInTheDocument()
     expect(screen.getByRole('list', { name: 'Joueurs de GRADIGNAN' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Nouveau match : en équipe B' }))
+    const dialogue = within(await screen.findByRole('dialog', { name: 'Un match est en cours' }))
+    expect(dialogue.getByText('Il restera enregistré mais ne sera plus repris automatiquement.')).toBeInTheDocument()
+    await user.click(dialogue.getByRole('button', { name: 'Annuler' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Équipe reçue' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Nouveau match : en équipe B' }))
+    await user.click(
+      within(await screen.findByRole('dialog', { name: 'Un match est en cours' })).getByRole('button', {
+        name: 'Créer un nouveau match',
+      }),
+    )
     const groupeB = within(await screen.findByRole('group', { name: 'Équipe B' }))
     expect(groupeB.getByLabelText("Nom de l'équipe")).toHaveValue('GRADIGNAN')
     expect(groupeB.getByLabelText('N° joueur 2')).toHaveValue('8')
@@ -175,6 +186,7 @@ describe('équipe reçue par lien', () => {
     await user.click(screen.getByRole('button', { name: 'Lire le code' }))
     await user.click(screen.getByRole('button', { name: 'Utiliser cette équipe' }))
     await user.click(await screen.findByRole('button', { name: 'Nouveau match : en équipe A' }))
+    expect(screen.queryByRole('dialog', { name: 'Un match est en cours' })).not.toBeInTheDocument()
     const groupeA = within(await screen.findByRole('group', { name: 'Équipe A' }))
     expect(groupeA.getByLabelText("Nom de l'équipe")).toHaveValue('GRADIGNAN')
   })

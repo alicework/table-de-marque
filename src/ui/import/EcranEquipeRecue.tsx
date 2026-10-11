@@ -1,6 +1,9 @@
+import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { lireCodeEquipe, type EquipePartagee } from '../../roster-share/format'
 import type { EquipeId } from '../../domain/types'
+import { matchEnCours } from '../../storage/matchs'
+import { Dialogue } from '../commun/Dialogue'
 import { ApercuEquipe } from './ApercuEquipe'
 import { ImportEquipe } from './ImportEquipe'
 
@@ -23,6 +26,17 @@ export function EcranEquipeRecue({ codeInitial, onUtiliser, onRetour }: Props) {
   const [initiale] = useState(() => lectureInitiale(codeInitial))
   const [equipe, setEquipe] = useState<EquipePartagee | null>(initiale.equipe)
   const [message, setMessage] = useState<string | null>(null)
+  const enCours = useLiveQuery(() => matchEnCours(), [])
+  const [confirmation, setConfirmation] = useState<EquipeId | null>(null)
+
+  // Un second match en cours rendrait le premier inaccessible : on prévient avant (comme sur l'accueil).
+  function demanderNouveauMatch(cote: EquipeId, recue: EquipePartagee) {
+    if (enCours) {
+      setConfirmation(cote)
+    } else {
+      onUtiliser(cote, recue)
+    }
+  }
 
   async function copierCode() {
     if (codeInitial === null) return
@@ -51,10 +65,10 @@ export function EcranEquipeRecue({ codeInitial, onUtiliser, onRetour }: Props) {
         <>
           <ApercuEquipe equipe={equipe} />
           <div className="actions-equipe">
-            <button className="btn btn-principal" onClick={() => onUtiliser('A', equipe)}>
+            <button className="btn btn-principal" onClick={() => demanderNouveauMatch('A', equipe)}>
               Nouveau match : en équipe A
             </button>
-            <button className="btn btn-principal" onClick={() => onUtiliser('B', equipe)}>
+            <button className="btn btn-principal" onClick={() => demanderNouveauMatch('B', equipe)}>
               Nouveau match : en équipe B
             </button>
           </div>
@@ -73,6 +87,23 @@ export function EcranEquipeRecue({ codeInitial, onUtiliser, onRetour }: Props) {
         </>
       ) : (
         <ImportEquipe onImporter={setEquipe} onFermer={onRetour} />
+      )}
+      {equipe && confirmation && (
+        <Dialogue
+          titre="Un match est en cours"
+          actions={
+            <>
+              <button className="btn btn-principal" onClick={() => onUtiliser(confirmation, equipe)}>
+                Créer un nouveau match
+              </button>
+              <button className="btn" onClick={() => setConfirmation(null)}>
+                Annuler
+              </button>
+            </>
+          }
+        >
+          <p>Il restera enregistré mais ne sera plus repris automatiquement.</p>
+        </Dialogue>
       )}
     </section>
   )
