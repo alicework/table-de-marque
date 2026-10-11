@@ -1,6 +1,7 @@
 import type { Club, Licencie } from '../../domain/club'
 import { nouvelId } from '../../domain/match'
 import type { Civilite, Coach, EquipeMatch } from '../../domain/types'
+import type { EquipePartagee } from '../../roster-share/format'
 
 export interface JoueurBrouillon {
   id: string
@@ -134,4 +135,55 @@ export function appliquerSelection(
       civilite: licencie.civilite,
     }))
   return coachCoherent({ ...brouillon, joueurs: [...gardees, ...ajoutees] })
+}
+
+export function brouillonVersPartage(brouillon: BrouillonEquipe): EquipePartagee {
+  const lignes = brouillon.joueurs.filter((joueur) => !estVide(joueur))
+  let coach: EquipePartagee['coach'] = null
+  const indexCoach = lignes.findIndex((joueur) => joueur.id === brouillon.coachJoueurId)
+  if (brouillon.modeCoach === 'joueur' && indexCoach !== -1) coach = { type: 'joueur', index: indexCoach }
+  if (brouillon.modeCoach === 'libre' && brouillon.coachNomLibre.trim()) {
+    coach = { type: 'libre', nom: brouillon.coachNomLibre.trim() }
+  }
+  return {
+    nom: brouillon.nom.trim(),
+    couleur: brouillon.couleur.trim(),
+    joueurs: lignes.map((joueur) => {
+      const numero = lireNumero(joueur.numero)
+      return {
+        licence: joueur.licence.trim(),
+        nom: joueur.nom.trim(),
+        prenom: joueur.prenom.trim(),
+        civilite: joueur.civilite,
+        numero: Number.isNaN(numero) ? null : numero,
+      }
+    }),
+    coach,
+  }
+}
+
+export function partageVersBrouillon(equipe: EquipePartagee): BrouillonEquipe {
+  const joueurs: JoueurBrouillon[] = equipe.joueurs.map((joueur) => ({
+    id: nouvelId(),
+    licencieId: null,
+    numero: joueur.numero === null ? '' : String(joueur.numero),
+    nom: joueur.nom,
+    prenom: joueur.prenom,
+    licence: joueur.licence,
+    civilite: joueur.civilite,
+  }))
+  const brouillon: BrouillonEquipe = {
+    nom: equipe.nom,
+    couleur: equipe.couleur,
+    clubId: null,
+    joueurs: joueurs.length > 0 ? joueurs : [joueurBrouillonVide()],
+    modeCoach: 'aucun',
+    coachJoueurId: '',
+    coachNomLibre: '',
+  }
+  if (equipe.coach?.type === 'joueur' && joueurs[equipe.coach.index]) {
+    return { ...brouillon, modeCoach: 'joueur', coachJoueurId: joueurs[equipe.coach.index].id }
+  }
+  if (equipe.coach?.type === 'libre') return { ...brouillon, modeCoach: 'libre', coachNomLibre: equipe.coach.nom }
+  return brouillon
 }

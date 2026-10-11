@@ -3,10 +3,12 @@ import { CLUB_TEST, LICENCIES_TEST } from '../../test/fixturesClubs'
 import {
   appliquerSelection,
   brouillonVersEquipe,
+  brouillonVersPartage,
   brouillonVide,
   choisirClub,
   joueurBrouillonVide,
   lireNumero,
+  partageVersBrouillon,
   type BrouillonEquipe,
 } from './brouillon'
 
@@ -138,6 +140,55 @@ describe('sélection dans le pool', () => {
       const apres = choisirClub(b, CLUB_B, CLUB_TEST)
       expect(apres.joueurs).toHaveLength(1)
       expect(apres.joueurs[0]).toMatchObject({ licencieId: null, nom: '' })
+    })
+  })
+})
+
+describe('conversion pour le partage', () => {
+  it('convertit un brouillon : n° vides ou invalides → null, coach par position, lignes vides ignorées', () => {
+    const b: BrouillonEquipe = {
+      ...brouillonVide(),
+      nom: ' SD ',
+      couleur: 'Vert',
+      joueurs: [
+        { id: 'x', licencieId: null, numero: '07', nom: 'Martin', prenom: 'Chloé', licence: '033_1', civilite: 'Mme' },
+        { id: 'vide', licencieId: null, numero: '', nom: '', prenom: '', licence: '', civilite: null },
+        { id: 'y', licencieId: 'lic', numero: 'abc', nom: 'Petit', prenom: 'Hugo', licence: '', civilite: 'M' },
+      ],
+      modeCoach: 'joueur',
+      coachJoueurId: 'y',
+    }
+    expect(brouillonVersPartage(b)).toEqual({
+      nom: 'SD',
+      couleur: 'Vert',
+      joueurs: [
+        { licence: '033_1', nom: 'Martin', prenom: 'Chloé', civilite: 'Mme', numero: 7 },
+        { licence: '', nom: 'Petit', prenom: 'Hugo', civilite: 'M', numero: null },
+      ],
+      coach: { type: 'joueur', index: 1 },
+    })
+  })
+
+  it('reconstruit un brouillon prêt à compléter', () => {
+    const b = partageVersBrouillon({
+      nom: 'GRADIGNAN',
+      couleur: 'Noir',
+      joueurs: [
+        { licence: '033_5', nom: 'Bernard', prenom: 'Jade', civilite: 'Mme', numero: 5 },
+        { licence: '033_8', nom: 'Moreau', prenom: 'Sam', civilite: 'M', numero: null },
+      ],
+      coach: { type: 'joueur', index: 0 },
+    })
+    expect(b.clubId).toBeNull()
+    expect(b.joueurs.map((j) => [j.numero, j.nom, j.licencieId])).toEqual([
+      ['5', 'Bernard', null],
+      ['', 'Moreau', null],
+    ])
+    expect(b.modeCoach).toBe('joueur')
+    expect(b.coachJoueurId).toBe(b.joueurs[0].id)
+    expect(partageVersBrouillon({ nom: 'X', couleur: '', joueurs: [], coach: { type: 'libre', nom: 'Max' } })).toMatchObject({
+      modeCoach: 'libre',
+      coachNomLibre: 'Max',
     })
   })
 })
