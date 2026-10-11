@@ -78,13 +78,37 @@ export function brouillonVersEquipe(brouillon: BrouillonEquipe): EquipeMatch {
   return { nom: brouillon.nom.trim(), couleur: brouillon.couleur.trim(), joueurs, coach }
 }
 
-export function choisirClub(brouillon: BrouillonEquipe, club: Club | null): BrouillonEquipe {
-  if (!club) return { ...brouillon, clubId: null }
-  return {
+/** Remet le coach à « aucun » si la ligne qui le désignait a disparu. */
+function coachCoherent(brouillon: BrouillonEquipe): BrouillonEquipe {
+  if (brouillon.modeCoach !== 'joueur' || brouillon.joueurs.some((joueur) => joueur.id === brouillon.coachJoueurId)) {
+    return brouillon
+  }
+  return { ...brouillon, modeCoach: 'aucun', coachJoueurId: '' }
+}
+
+/**
+ * Changer de club retire les lignes venues de l'ancien pool et remplace le nom et la couleur
+ * qui étaient ceux de l'ancien club (`precedent`) ; une saisie à la main est conservée.
+ */
+export function choisirClub(
+  brouillon: BrouillonEquipe,
+  club: Club | null,
+  precedent: Club | null = null,
+): BrouillonEquipe {
+  if ((club?.id ?? null) === brouillon.clubId) return brouillon
+  const manuelles = brouillon.joueurs.filter((joueur) => joueur.licencieId === null)
+  const sansPool = coachCoherent({
     ...brouillon,
-    clubId: club.id,
-    nom: brouillon.nom.trim() ? brouillon.nom : club.nom,
-    couleur: brouillon.couleur.trim() ? brouillon.couleur : club.couleurParDefaut,
+    clubId: club?.id ?? null,
+    joueurs: manuelles.length > 0 ? manuelles : [joueurBrouillonVide()],
+  })
+  if (!club) return sansPool
+  const nomSaisi = brouillon.nom.trim() && brouillon.nom !== precedent?.nom
+  const couleurSaisie = brouillon.couleur.trim() && brouillon.couleur !== precedent?.couleurParDefaut
+  return {
+    ...sansPool,
+    nom: nomSaisi ? brouillon.nom : club.nom,
+    couleur: couleurSaisie ? brouillon.couleur : club.couleurParDefaut,
   }
 }
 
@@ -109,5 +133,5 @@ export function appliquerSelection(
       licence: licencie.licence,
       civilite: licencie.civilite,
     }))
-  return { ...brouillon, joueurs: [...gardees, ...ajoutees] }
+  return coachCoherent({ ...brouillon, joueurs: [...gardees, ...ajoutees] })
 }

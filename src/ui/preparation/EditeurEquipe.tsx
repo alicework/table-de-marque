@@ -44,7 +44,15 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
         Club
         <select
           value={valeur.clubId ?? ''}
-          onChange={(e) => onChange(choisirClub(valeur, clubs?.find((club) => club.id === e.target.value) ?? null))}
+          onChange={(e) =>
+            onChange(
+              choisirClub(
+                valeur,
+                clubs?.find((club) => club.id === e.target.value) ?? null,
+                clubs?.find((club) => club.id === valeur.clubId) ?? null,
+              ),
+            )
+          }
         >
           <option value="">Saisie libre</option>
           {clubs?.map((club) => (

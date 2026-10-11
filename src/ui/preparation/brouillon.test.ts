@@ -104,5 +104,40 @@ describe('sélection dans le pool', () => {
     b = appliquerSelection(b, LICENCIES_TEST, new Set([martin.id]))
     expect(b.joueurs.map((j) => [j.nom, j.numero])).toEqual([['Martin', '4']])
     expect(brouillonVersEquipe({ ...b, nom: 'SD' }).coach).toBeNull()
+    expect(b.modeCoach).toBe('aucun')
+    expect(b.coachJoueurId).toBe('')
+  })
+
+  describe('changement de club', () => {
+    const CLUB_B = { id: 'club-b', numeroAssociation: null, nom: 'AUDENGE', couleurParDefaut: 'Blanc' }
+
+    function equipeDuClubA(): BrouillonEquipe {
+      let b = choisirClub(brouillonVide(), CLUB_TEST)
+      b = appliquerSelection(b, LICENCIES_TEST, new Set([martin.id, durand.id]))
+      return { ...b, joueurs: [...b.joueurs, { ...joueurBrouillonVide(), nom: 'Essai', numero: '30' }] }
+    }
+
+    it("changer de club retire les joueurs de l'ancien club et reprend son nom et sa couleur", () => {
+      const b = choisirClub(equipeDuClubA(), CLUB_B, CLUB_TEST)
+      expect(b).toMatchObject({ clubId: 'club-b', nom: 'AUDENGE', couleur: 'Blanc' })
+      expect(b.joueurs.map((j) => j.nom)).toEqual(['Essai'])
+    })
+
+    it('garde un nom saisi à la main en changeant de club', () => {
+      const b = choisirClub({ ...equipeDuClubA(), nom: 'SD 2', couleur: 'Rouge' }, CLUB_B, CLUB_TEST)
+      expect(b).toMatchObject({ clubId: 'club-b', nom: 'SD 2', couleur: 'Rouge' })
+    })
+
+    it('rechoisir le même club ne change rien', () => {
+      const avant = equipeDuClubA()
+      expect(choisirClub(avant, CLUB_TEST, CLUB_TEST)).toEqual(avant)
+    })
+
+    it('garde une ligne vide si plus aucune ligne ne reste', () => {
+      const b = appliquerSelection(choisirClub(brouillonVide(), CLUB_TEST), LICENCIES_TEST, new Set([martin.id]))
+      const apres = choisirClub(b, CLUB_B, CLUB_TEST)
+      expect(apres.joueurs).toHaveLength(1)
+      expect(apres.joueurs[0]).toMatchObject({ licencieId: null, nom: '' })
+    })
   })
 })

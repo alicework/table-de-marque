@@ -66,6 +66,7 @@ export function DialogueSelection({ clubId, brouillon, onValider, onFermer }: Pr
       <p className="sous-titre">
         {total} / {REGLES.joueursMax} joueurs
       </p>
+      {plein && <p className="avertissements">{REGLES.joueursMax} joueurs maximum (lignes de la feuille).</p>}
       {licencies?.length === 0 && <p>Aucun licencié dans ce club.</p>}
       <ul className="liste-selection">
         {visibles.map((licencie) => (
