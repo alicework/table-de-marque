@@ -9,10 +9,13 @@ import {
   brouillonVersEquipe,
   brouillonVersPartage,
   choisirClub,
+  estVide,
   joueurBrouillonVide,
+  partageVersBrouillon,
   type BrouillonEquipe,
   type JoueurBrouillon,
 } from './brouillon'
+import { ImportEquipe } from '../import/ImportEquipe'
 import { DialoguePartage } from '../partage/DialoguePartage'
 import { DialogueSelection } from './DialogueSelection'
 
@@ -32,6 +35,8 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
   const clubs = useLiveQuery(() => listerClubs(), [])
   const [selection, setSelection] = useState(false)
   const [partage, setPartage] = useState(false)
+  const [importation, setImportation] = useState(false)
+  const dejaSaisie = valeur.nom.trim() !== '' || valeur.joueurs.some((joueur) => !estVide(joueur))
   const maj = (modification: Partial<BrouillonEquipe>) => onChange({ ...valeur, ...modification })
   const majJoueur = (id: string, modification: Partial<JoueurBrouillon>) =>
     maj({ joueurs: valeur.joueurs.map((j) => (j.id === id ? { ...j, ...modification } : j)) })
@@ -72,6 +77,9 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
         </button>
         <button type="button" className="btn" disabled={!peutPartager} onClick={() => setPartage(true)}>
           Partager cette équipe
+        </button>
+        <button type="button" className="btn" onClick={() => setImportation(true)}>
+          Importer une équipe (QR / code)
         </button>
       </div>
       <label>
@@ -216,6 +224,16 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
         />
       )}
       {partage && <DialoguePartage equipe={brouillonVersPartage(valeur)} onFermer={() => setPartage(false)} />}
+      {importation && (
+        <ImportEquipe
+          remplacement={dejaSaisie}
+          onImporter={(equipeRecue) => {
+            onChange(partageVersBrouillon(equipeRecue))
+            setImportation(false)
+          }}
+          onFermer={() => setImportation(false)}
+        />
+      )}
     </fieldset>
   )
 }

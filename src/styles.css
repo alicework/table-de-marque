@@ -553,3 +553,10 @@ label {
   background: #fff;
   border-radius: 8px;
 }
+
+.video-scanner {
+  width: 100%;
+  max-height: 50dvh;
+  background: #000;
+  border-radius: 8px;
+}
