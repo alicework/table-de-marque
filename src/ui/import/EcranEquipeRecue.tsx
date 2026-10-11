@@ -56,11 +56,6 @@ export function EcranEquipeRecue({ codeInitial, onUtiliser, onRetour }: Props) {
           Retour
         </button>
       </header>
-      {initiale.erreur && !equipe && (
-        <p role="alert" className="erreurs">
-          {initiale.erreur}
-        </p>
-      )}
       {equipe ? (
         <>
           <ApercuEquipe equipe={equipe} />
@@ -86,7 +81,7 @@ export function EcranEquipeRecue({ codeInitial, onUtiliser, onRetour }: Props) {
           )}
         </>
       ) : (
-        <ImportEquipe onImporter={setEquipe} onFermer={onRetour} />
+        <ImportEquipe onImporter={setEquipe} onFermer={onRetour} erreurInitiale={initiale.erreur} />
       )}
       {equipe && confirmation && (
         <Dialogue

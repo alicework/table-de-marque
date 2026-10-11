@@ -167,8 +167,9 @@ describe('équipe reçue par lien', () => {
   it('explique un lien illisible et propose les autres moyens', async () => {
     render(<App codeEquipe="#equipe=%%%" />)
     expect(await screen.findByRole('heading', { name: 'Équipe reçue' })).toBeInTheDocument()
-    expect(screen.getAllByRole('alert')[0]).toHaveTextContent('Code non reconnu')
-    expect(screen.getByRole('dialog', { name: 'Importer une équipe' })).toBeInTheDocument()
+    const dialogue = screen.getByRole('dialog', { name: 'Importer une équipe' })
+    expect(within(dialogue).getByRole('alert')).toHaveTextContent('Code non reconnu')
+    expect(screen.getAllByRole('alert')).toHaveLength(1)
   })
 
   it("propose de copier le code quand le lien s'est ouvert dans le navigateur", async () => {

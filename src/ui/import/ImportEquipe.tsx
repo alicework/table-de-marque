@@ -10,11 +10,13 @@ interface Props {
   onFermer: () => void
   /** Vrai quand une équipe déjà saisie sera remplacée. */
   remplacement?: boolean
+  /** Erreur à afficher dès l'ouverture (lien illisible), dans le dialogue et non derrière son voile. */
+  erreurInitiale?: string | null
 }
 
-export function ImportEquipe({ onImporter, onFermer, remplacement = false }: Props) {
+export function ImportEquipe({ onImporter, onFermer, remplacement = false, erreurInitiale = null }: Props) {
   const [saisie, setSaisie] = useState('')
-  const [erreur, setErreur] = useState<string | null>(null)
+  const [erreur, setErreur] = useState<string | null>(erreurInitiale)
   const [scan, setScan] = useState(false)
   const [equipe, setEquipe] = useState<EquipePartagee | null>(null)
 
@@ -97,7 +99,6 @@ export function ImportEquipe({ onImporter, onFermer, remplacement = false }: Pro
         Choisir un fichier
         <input
           type="file"
-          accept=".txt,text/plain"
           className="masque"
           onChange={(e) => {
             void lireFichier(e.target.files?.[0])
