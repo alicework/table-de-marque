@@ -69,6 +69,21 @@ describe('lireExportWebaffiligue', () => {
     expect(clubs[0].licencies[0]).toMatchObject({ nom: 'Noël', prenom: 'Raphaël', civilite: 'M' })
   })
 
+  it('lit un export ré-enregistré par Excel (UTF-8 avec BOM, virgule, en-têtes non encapsulés)', () => {
+    const texte = [
+      'N° Association,Nom association,Type licence,N° Adherent,Civilite,Nom,Prénom',
+      '033550002,SAINT DELPHIN BASKET,Loisirs,033_1,Mme,Lefèvre,Bérénice',
+    ].join('\r\n')
+    const { clubs } = lireExportWebaffiligue(utf8AvecBom(`${texte}\r\n`))
+    expect(clubs).toHaveLength(1)
+    expect(clubs[0].licencies[0]).toMatchObject({
+      licence: '033_1',
+      nom: 'Lefèvre',
+      prenom: 'Bérénice',
+      civilite: 'Mme',
+    })
+  })
+
   it('accepte le séparateur virgule', () => {
     const texte = `${ENTETE}\n${ligne('033_1', 'M', 'Martin', 'Hugo')}`.replaceAll(';', ',')
     expect(lireExportWebaffiligue(latin1(texte)).clubs[0].licencies[0].nom).toBe('Martin')

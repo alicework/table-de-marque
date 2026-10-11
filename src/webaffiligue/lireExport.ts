@@ -97,7 +97,7 @@ export function nettoyerValeur(brute: string): string {
 export function normaliserEntete(entete: string): string {
   return entete
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[°º]/g, '')
     .replace(/[^a-z0-9]+/g, ' ')
