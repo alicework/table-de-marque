@@ -11,7 +11,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "typecheck": "tsc -b",
-    "icones": "pwa-assets-generator --preset minimal-2023 public/icone.svg"
+    "icones": "pwa-assets-generator --preset minimal-2023 public/icone.svg",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "dexie": "^4.4.6",
@@ -20,6 +21,7 @@
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
