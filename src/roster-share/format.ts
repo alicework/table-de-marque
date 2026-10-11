@@ -68,6 +68,13 @@ function depuisBase64Url(texte: string): Uint8Array {
   return Uint8Array.from(binaire, (c) => c.charCodeAt(0))
 }
 
+/** FNV-1a 32 bits : le deflate brut n'a pas de somme de contrôle, un caractère altéré passerait sinon inaperçu. */
+function empreinte(octets: Uint8Array): number {
+  let hash = 0x811c9dc5
+  for (const octet of octets) hash = Math.imul(hash ^ octet, 0x01000193) >>> 0
+  return hash
+}
+
 export function encoderEquipe(equipe: EquipePartagee): string {
   let coach: EquipeCompacte['k'] = null
   if (equipe.coach?.type === 'joueur') coach = equipe.coach.index
@@ -79,7 +86,12 @@ export function encoderEquipe(equipe: EquipePartagee): string {
     k: coach,
     j: equipe.joueurs.map((j) => [j.licence, j.nom, j.prenom, versCompacte(j.civilite), j.numero ?? -1]),
   }
-  return versBase64Url(deflateSync(strToU8(JSON.stringify(compacte)), { level: 9 }))
+  const json = strToU8(JSON.stringify(compacte))
+  const compresse = deflateSync(json, { level: 9 })
+  const octets = new Uint8Array(compresse.length + 4)
+  octets.set(compresse)
+  new DataView(octets.buffer).setUint32(compresse.length, empreinte(json))
+  return versBase64Url(octets)
 }
 
 function estJoueurCompact(valeur: unknown): valeur is JoueurCompact {
@@ -104,10 +116,29 @@ function estEquipeCompacte(valeur: unknown): valeur is EquipeCompacte {
   return typeof e.k === 'number' && Number.isInteger(e.k) && e.k >= 0 && e.k < e.j.length
 }
 
+/** Octets JSON d'un code, après contrôle de la somme de contrôle ; lève si le code est altéré. */
+function lireJson(code: string): Uint8Array {
+  const octets = depuisBase64Url(code)
+  if (octets.length < 5) throw new Error('code trop court')
+  const json = inflateSync(octets.subarray(0, -4))
+  const attendue = new DataView(octets.buffer, octets.byteOffset + octets.length - 4, 4).getUint32(0)
+  if (empreinte(json) !== attendue) throw new Error('somme de contrôle invalide')
+  return json
+}
+
+function estIntegre(code: string): boolean {
+  try {
+    lireJson(code)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function decoderEquipe(code: string): EquipePartagee {
   let brut: unknown
   try {
-    brut = JSON.parse(strFromU8(inflateSync(depuisBase64Url(code))))
+    brut = JSON.parse(strFromU8(lireJson(code)))
   } catch {
     throw new ErreurCodeEquipe(CODE_NON_RECONNU)
   }
@@ -136,13 +167,21 @@ export function lienEquipe(code: string, adresseApp: string): string {
   return `${adresseApp}#${PARAMETRE_LIEN}=${code}`
 }
 
-/** Accepte un lien complet ou le code seul, même coupé par des espaces ou des retours à la ligne. */
+/**
+ * Accepte un lien complet ou le code seul, même coupé par des espaces ou des retours à la ligne.
+ * Un lien suivi de texte (« …#equipe=CODE\nMerci ») et un lien coupé en deux (« …#equipe=CO\nDE ») se ressemblent :
+ * on retient la première lecture dont la somme de contrôle est valide.
+ */
 export function extraireCode(saisie: string): string | null {
   const texte = saisie.replace(/\s+/g, '')
   if (!texte) return null
-  const dansLien = new RegExp(`[#?&]${PARAMETRE_LIEN}=([A-Za-z0-9_-]+)`).exec(texte)
-  if (dansLien) return dansLien[1]
-  return /^[A-Za-z0-9_-]+$/.test(texte) ? texte : null
+  const motif = new RegExp(`[#?&]${PARAMETRE_LIEN}=([A-Za-z0-9_-]+)`)
+  const candidats = [
+    motif.exec(saisie)?.[1],
+    motif.exec(texte)?.[1],
+    /^[A-Za-z0-9_-]+$/.test(texte) ? texte : undefined,
+  ].filter((candidat): candidat is string => candidat !== undefined)
+  return candidats.find(estIntegre) ?? candidats[0] ?? null
 }
 
 export function lireCodeEquipe(saisie: string): EquipePartagee {

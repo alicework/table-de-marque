@@ -4,7 +4,7 @@ import QRCode from 'qrcode'
 export const NIVEAU_CORRECTION_QR = 'L'
 
 export function qrSvg(texte: string): Promise<string> {
-  return QRCode.toString(texte, { type: 'svg', errorCorrectionLevel: NIVEAU_CORRECTION_QR, margin: 2 })
+  return QRCode.toString(texte, { type: 'svg', errorCorrectionLevel: NIVEAU_CORRECTION_QR, margin: 4 })
 }
 
 export function versionQr(texte: string): number {

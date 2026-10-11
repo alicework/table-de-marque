@@ -26,6 +26,20 @@ const EQUIPE: EquipePartagee = {
 const base64Url = (octets: Uint8Array) =>
   btoa(String.fromCharCode(...octets)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+
+/** Même somme de contrôle que le format : FNV-1a 32 bits, ajoutée en 4 octets big-endian après le contenu compressé. */
+function forger(objet: unknown): string {
+  const json = strToU8(JSON.stringify(objet))
+  let hash = 0x811c9dc5
+  for (const octet of json) hash = Math.imul(hash ^ octet, 0x01000193) >>> 0
+  const compresse = deflateSync(json)
+  const octets = new Uint8Array(compresse.length + 4)
+  octets.set(compresse)
+  new DataView(octets.buffer).setUint32(compresse.length, hash)
+  return base64Url(octets)
+}
+
 describe('encodage d’une équipe', () => {
   it('fait un aller-retour sans perte (accents, n° absent, coach)', () => {
     expect(decoderEquipe(encoderEquipe(EQUIPE))).toEqual(EQUIPE)
@@ -47,7 +61,7 @@ describe('encodage d’une équipe', () => {
   })
 
   it('refuse un contenu valide en apparence mais mal formé', () => {
-    const forge = (objet: unknown) => base64Url(deflateSync(strToU8(JSON.stringify(objet))))
+    const forge = forger
     expect(() => decoderEquipe(forge({ v: 1, n: 'X', c: '', k: 5, j: [] }))).toThrow(CODE_NON_RECONNU)
     expect(() => decoderEquipe(forge({ v: 1, n: 'X', c: '', k: null, j: [['', 'A', 'B', 'Z', 4]] }))).toThrow(
       CODE_NON_RECONNU,
@@ -57,8 +71,23 @@ describe('encodage d’une équipe', () => {
     )
   })
 
+  it('refuse un code dont un caractère a été modifié', () => {
+    const code = encoderEquipe(EQUIPE)
+    for (let i = 0; i < code.length; i++) {
+      // On inverse le bit de poids fort du caractère : il compte toujours, même pour le dernier caractère.
+      const remplacant = ALPHABET[ALPHABET.indexOf(code[i]) ^ 32]
+      const abime = code.slice(0, i) + remplacant + code.slice(i + 1)
+      expect(() => decoderEquipe(abime), `position ${i}`).toThrow(ErreurCodeEquipe)
+    }
+  })
+
+  it('refuse un code sans somme de contrôle', () => {
+    expect(() => decoderEquipe(base64Url(deflateSync(strToU8('{"v":1}'))))).toThrow(CODE_NON_RECONNU)
+    expect(() => decoderEquipe('AAAA')).toThrow(CODE_NON_RECONNU)
+  })
+
   it("demande une mise à jour pour un code d'une version plus récente", () => {
-    const code = base64Url(deflateSync(strToU8(JSON.stringify({ v: 2, n: 'X', c: '', k: null, j: [] }))))
+    const code = forger({ v: 2, n: 'X', c: '', k: null, j: [] })
     expect(() => decoderEquipe(code)).toThrow(CODE_TROP_RECENT)
   })
 })
@@ -77,6 +106,16 @@ describe('liens et saisie tolérante', () => {
     expect(extraireCode(`${code.slice(0, 20)}\n${code.slice(20)}`)).toBe(code)
     expect(extraireCode('Voici notre équipe !')).toBeNull()
     expect(extraireCode('   ')).toBeNull()
+  })
+
+  it('extrait le code d’un lien suivi de texte', () => {
+    expect(extraireCode(`${lien}\nMerci à vous !`)).toBe(code)
+    expect(extraireCode(`Notre équipe : ${lien} Merci`)).toBe(code)
+  })
+
+  it('extrait le code d’un lien coupé par un retour à la ligne', () => {
+    const coupe = `${lien.slice(0, 40)}\n${lien.slice(40)}`
+    expect(extraireCode(coupe)).toBe(code)
   })
 
   it('lit directement un lien collé, et explique un échec', () => {

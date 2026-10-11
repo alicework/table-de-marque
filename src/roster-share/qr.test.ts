@@ -19,6 +19,23 @@ const NOMS = [
   ['Bonnet', 'Océane'],
 ]
 
+const LICENCES = [
+  '033_00000101',
+  '033_00000102',
+  '033_00000103',
+  'ZZ00000004',
+  'ZZ00000003',
+  'ZZ00000002',
+  'ZZ00000001',
+  'ZZ00000005',
+  '033_00000109',
+  '033_00000110',
+  '033_00000111',
+  '033_00000112',
+  '033_00000113',
+  '033_00000115',
+]
+
 describe('QR code', () => {
   it('tient dans un QR facile à scanner (version ≤ 18) pour 14 joueurs aux noms accentués', () => {
     const equipe: EquipePartagee = {
@@ -26,7 +43,7 @@ describe('QR code', () => {
       couleur: 'Vert et blanc',
       coach: { type: 'libre', nom: 'Camille Lefebvre-Ducasse' },
       joueurs: NOMS.map(([nom, prenom], i) => ({
-        licence: `033_${10000101 + i * 7919}`,
+        licence: LICENCES[i],
         nom,
         prenom,
         civilite: i % 3 === 0 ? 'Mme' : 'M',
