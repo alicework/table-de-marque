@@ -6,9 +6,10 @@ import { Dialogue } from './commun/Dialogue'
 interface Props {
   onNouveauMatch: () => void
   onReprendre: (matchId: string) => void
+  onClubs: () => void
 }
 
-export function Accueil({ onNouveauMatch, onReprendre }: Props) {
+export function Accueil({ onNouveauMatch, onReprendre, onClubs }: Props) {
   const enCours = useLiveQuery(() => matchEnCours(), [])
   const [confirmation, setConfirmation] = useState(false)
 
@@ -36,6 +37,9 @@ export function Accueil({ onNouveauMatch, onReprendre }: Props) {
       )}
       <button className="btn" onClick={demanderNouveauMatch}>
         Nouveau match
+      </button>
+      <button className="btn" onClick={onClubs}>
+        Clubs et licenciés
       </button>
       {confirmation && (
         <Dialogue

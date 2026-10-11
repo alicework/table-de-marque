@@ -2,11 +2,17 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { matchEnCours } from './storage/matchs'
 import { Accueil } from './ui/Accueil'
+import { EcranClubs } from './ui/clubs/EcranClubs'
 import { MiseAJour } from './ui/MiseAJour'
 import { PreparationMatch } from './ui/preparation/PreparationMatch'
 import { EcranMatch } from './ui/saisie/EcranMatch'
 
-type Ecran = { nom: 'chargement' } | { nom: 'accueil' } | { nom: 'preparation' } | { nom: 'match'; matchId: string }
+type Ecran =
+  | { nom: 'chargement' }
+  | { nom: 'accueil' }
+  | { nom: 'preparation' }
+  | { nom: 'match'; matchId: string }
+  | { nom: 'clubs' }
 
 export default function App() {
   const [ecran, setEcran] = useState<Ecran>({ nom: 'chargement' })
@@ -35,10 +41,15 @@ export default function App() {
     <main className="app">
       {ecran.nom === 'chargement' && <p className="chargement">Chargement…</p>}
       {ecran.nom === 'accueil' && (
-        <Accueil onNouveauMatch={() => setEcran({ nom: 'preparation' })} onReprendre={ouvrirMatch} />
+        <Accueil
+          onNouveauMatch={() => setEcran({ nom: 'preparation' })}
+          onReprendre={ouvrirMatch}
+          onClubs={() => setEcran({ nom: 'clubs' })}
+        />
       )}
       {ecran.nom === 'preparation' && <PreparationMatch onDemarre={ouvrirMatch} onRetour={allerAccueil} />}
       {ecran.nom === 'match' && <EcranMatch key={ecran.matchId} matchId={ecran.matchId} onAccueil={allerAccueil} />}
+      {ecran.nom === 'clubs' && <EcranClubs onRetour={allerAccueil} />}
       <MiseAJour autorisee={miseAJourAutorisee} />
     </main>
   )
