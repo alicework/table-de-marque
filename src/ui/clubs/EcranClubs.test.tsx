@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { db } from '../../storage/db'
 import { creerClubDeTest } from '../../test/fixturesClubs'
+import { MESSAGE_ERREUR_STOCKAGE } from '../useMatch'
 import { EcranClubs } from './EcranClubs'
 
 async function afficher() {
@@ -106,5 +107,42 @@ describe('EcranClubs', () => {
     await user.click(dialogue.getByRole('button', { name: 'Supprimer' }))
     expect(await screen.findByText(/Aucun club pour l'instant/)).toBeInTheDocument()
     expect(await db.licencies.count()).toBe(0)
+  })
+
+  it("signale un échec d'enregistrement d'un licencié", async () => {
+    await creerClubDeTest()
+    const user = await afficher()
+    await ouvrirClubDeTest(user)
+    await user.click(screen.getByRole('button', { name: 'Ajouter un licencié' }))
+    const dialogue = within(screen.getByRole('dialog', { name: 'Nouveau licencié' }))
+    await user.type(dialogue.getByLabelText('Nom'), 'Roux')
+    vi.spyOn(db.licencies, 'put').mockRejectedValueOnce(new Error('QuotaExceededError'))
+    await user.click(dialogue.getByRole('button', { name: 'Enregistrer' }))
+    expect(await dialogue.findByRole('alert')).toHaveTextContent(MESSAGE_ERREUR_STOCKAGE)
+    expect(screen.getByRole('dialog', { name: 'Nouveau licencié' })).toBeInTheDocument()
+  })
+
+  it("signale un échec de suppression d'un licencié", async () => {
+    await creerClubDeTest()
+    const user = await afficher()
+    await ouvrirClubDeTest(user)
+    await user.click(screen.getByRole('button', { name: 'Supprimer Léa Durand' }))
+    const dialogue = within(screen.getByRole('dialog', { name: 'Supprimer ce licencié ?' }))
+    vi.spyOn(db.licencies, 'delete').mockRejectedValueOnce(new Error('QuotaExceededError'))
+    await user.click(dialogue.getByRole('button', { name: 'Supprimer' }))
+    expect(await dialogue.findByRole('alert')).toHaveTextContent(MESSAGE_ERREUR_STOCKAGE)
+    expect(screen.getByText('Léa Durand', { selector: 'span' })).toBeInTheDocument()
+  })
+
+  it("signale un échec de suppression d'un club", async () => {
+    await creerClubDeTest()
+    const user = await afficher()
+    await ouvrirClubDeTest(user)
+    await user.click(screen.getByRole('button', { name: 'Supprimer le club' }))
+    const dialogue = within(screen.getByRole('dialog', { name: 'Supprimer le club ?' }))
+    vi.spyOn(db.clubs, 'delete').mockRejectedValueOnce(new Error('QuotaExceededError'))
+    await user.click(dialogue.getByRole('button', { name: 'Supprimer' }))
+    expect(await dialogue.findByRole('alert')).toHaveTextContent(MESSAGE_ERREUR_STOCKAGE)
+    expect(await db.clubs.count()).toBe(1)
   })
 })

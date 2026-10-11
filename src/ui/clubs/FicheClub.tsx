@@ -4,6 +4,7 @@ import { libelleLicencie, type Licencie } from '../../domain/club'
 import { listerLicencies, lireClub, supprimerClub, supprimerLicencie } from '../../storage/clubs'
 import { Dialogue } from '../commun/Dialogue'
 import { pluriel } from '../format'
+import { MESSAGE_ERREUR_STOCKAGE } from '../useMatch'
 import { DialogueClub } from './DialogueClub'
 import { DialogueLicencie } from './DialogueLicencie'
 
@@ -25,7 +26,26 @@ export function FicheClub({ clubId, onRetour }: Props) {
   const club = useLiveQuery(() => lireClub(clubId), [clubId])
   const licencies = useLiveQuery(() => listerLicencies(clubId), [clubId])
   const [edition, setEdition] = useState<Edition>(null)
-  const fermer = () => setEdition(null)
+  const [suppressionEnCours, setSuppressionEnCours] = useState(false)
+  const [erreurSuppression, setErreurSuppression] = useState<string | null>(null)
+  const fermer = () => {
+    setEdition(null)
+    setErreurSuppression(null)
+  }
+
+  // Une panne de stockage doit se voir : le dialogue reste ouvert avec le message.
+  async function confirmerSuppression(supprimer: () => Promise<void>, apres: () => void) {
+    setSuppressionEnCours(true)
+    setErreurSuppression(null)
+    try {
+      await supprimer()
+      apres()
+    } catch {
+      setErreurSuppression(MESSAGE_ERREUR_STOCKAGE)
+    } finally {
+      setSuppressionEnCours(false)
+    }
+  }
 
   if (!club || !licencies) return <p className="chargement">Chargement…</p>
 
@@ -95,10 +115,8 @@ export function FicheClub({ clubId, onRetour }: Props) {
             <>
               <button
                 className="btn btn-danger"
-                onClick={() => {
-                  void supprimerLicencie(edition.licencie.id)
-                  fermer()
-                }}
+                disabled={suppressionEnCours}
+                onClick={() => void confirmerSuppression(() => supprimerLicencie(edition.licencie.id), fermer)}
               >
                 Supprimer
               </button>
@@ -109,6 +127,11 @@ export function FicheClub({ clubId, onRetour }: Props) {
           }
         >
           <p>{libelleLicencie(edition.licencie)}</p>
+          {erreurSuppression && (
+            <p role="alert" className="erreurs">
+              {erreurSuppression}
+            </p>
+          )}
         </Dialogue>
       )}
       {edition?.type === 'suppressionClub' && (
@@ -118,9 +141,8 @@ export function FicheClub({ clubId, onRetour }: Props) {
             <>
               <button
                 className="btn btn-danger"
-                onClick={() => {
-                  void supprimerClub(clubId).then(onRetour)
-                }}
+                disabled={suppressionEnCours}
+                onClick={() => void confirmerSuppression(() => supprimerClub(clubId), onRetour)}
               >
                 Supprimer
               </button>
@@ -133,6 +155,11 @@ export function FicheClub({ clubId, onRetour }: Props) {
           <p>
             Ses {pluriel(licencies.length, 'licencié')} seront aussi supprimés. Les matchs déjà joués ne changent pas.
           </p>
+          {erreurSuppression && (
+            <p role="alert" className="erreurs">
+              {erreurSuppression}
+            </p>
+          )}
         </Dialogue>
       )}
     </section>
