@@ -59,7 +59,11 @@ export function brouillonVersEquipe(brouillon: BrouillonEquipe): EquipeMatch {
     }))
 
   let coach: Coach = null
-  if (brouillon.modeCoach === 'joueur' && brouillon.coachJoueurId) {
+  if (
+    brouillon.modeCoach === 'joueur' &&
+    brouillon.coachJoueurId &&
+    joueurs.some((joueur) => joueur.id === brouillon.coachJoueurId)
+  ) {
     coach = { type: 'joueur', joueurId: brouillon.coachJoueurId }
   }
   if (brouillon.modeCoach === 'libre' && brouillon.coachNomLibre.trim()) {

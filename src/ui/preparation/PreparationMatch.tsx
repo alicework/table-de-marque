@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { verifierEquipe } from '../../domain/equipe'
 import { nouveauMatch } from '../../domain/match'
 import { enregistrerMatch } from '../../storage/matchs'
@@ -19,17 +19,25 @@ export function PreparationMatch({ onDemarre, onRetour }: Props) {
   const [equipeB, setEquipeB] = useState(brouillonVide)
   const [tentative, setTentative] = useState(false)
   const [erreurStockage, setErreurStockage] = useState<string | null>(null)
+  const [enCours, setEnCours] = useState(false)
+  const verrou = useRef(false)
 
   async function demarrer() {
+    if (verrou.current) return
     setTentative(true)
     const equipes = { A: brouillonVersEquipe(equipeA), B: brouillonVersEquipe(equipeB) }
     const invalide = verifierEquipe(equipes.A).erreurs.length > 0 || verifierEquipe(equipes.B).erreurs.length > 0
     if (invalide) return
+    verrou.current = true
+    setEnCours(true)
+    setErreurStockage(null)
     try {
       const match = await enregistrerMatch(nouveauMatch({ date, lieu: lieu.trim(), equipes }))
       onDemarre(match.id)
     } catch {
       setErreurStockage(MESSAGE_ERREUR_STOCKAGE)
+      verrou.current = false
+      setEnCours(false)
     }
   }
 
@@ -55,7 +63,7 @@ export function PreparationMatch({ onDemarre, onRetour }: Props) {
         <EditeurEquipe titre="Équipe A" valeur={equipeA} onChange={setEquipeA} afficherErreurs={tentative} />
         <EditeurEquipe titre="Équipe B" valeur={equipeB} onChange={setEquipeB} afficherErreurs={tentative} />
       </div>
-      <button className="btn btn-principal" onClick={() => void demarrer()}>
+      <button className="btn btn-principal" disabled={enCours} onClick={() => void demarrer()}>
         Commencer le match
       </button>
       {erreurStockage && (

@@ -46,4 +46,11 @@ describe('brouillonVersEquipe', () => {
     })
     expect(brouillonVersEquipe({ ...brouillon, modeCoach: 'libre', coachNomLibre: '  ' }).coach).toBeNull()
   })
+
+  it("ignore un coach qui n'est plus dans les joueurs retenus", () => {
+    const retire = { ...brouillon, modeCoach: 'joueur' as const, coachJoueurId: 'retire' }
+    expect(brouillonVersEquipe(retire).coach).toBeNull()
+    const ligneVidee = { ...brouillon, modeCoach: 'joueur' as const, coachJoueurId: 'vide' }
+    expect(brouillonVersEquipe(ligneVidee).coach).toBeNull()
+  })
 })

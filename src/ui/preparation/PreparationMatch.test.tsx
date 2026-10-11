@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { db } from '../../storage/db'
 import { lireMatch } from '../../storage/matchs'
 import { remplirEquipe } from '../../test/remplirEquipe'
 import { PreparationMatch } from './PreparationMatch'
@@ -80,5 +81,21 @@ describe('PreparationMatch', () => {
     expect(screen.getByText('Seulement 1 joueuse : il en faut au moins 2 sur le terrain.')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Commencer le match' }))
     await waitFor(() => expect(onDemarre).toHaveBeenCalledTimes(1))
+  })
+
+  it('ne crée qu’un seul match en cas de double clic', async () => {
+    const user = userEvent.setup()
+    const onDemarre = vi.fn()
+    render(<PreparationMatch onDemarre={onDemarre} onRetour={vi.fn()} />)
+
+    await remplirEquipe(user, 'Équipe A', 'ST DELPHIN', [
+      { numero: '4', nom: 'Martin', civilite: 'Mme' },
+      { numero: '7', nom: 'Durand', civilite: 'Mme' },
+    ])
+    await remplirEquipe(user, 'Équipe B', 'GRADIGNAN', EQUIPE_B)
+    await user.dblClick(screen.getByRole('button', { name: 'Commencer le match' }))
+
+    await waitFor(() => expect(onDemarre).toHaveBeenCalledTimes(1))
+    expect(await db.matchs.count()).toBe(1)
   })
 })
