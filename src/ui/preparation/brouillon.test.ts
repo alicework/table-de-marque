@@ -130,6 +130,17 @@ describe('sélection dans le pool', () => {
       expect(b).toMatchObject({ clubId: 'club-b', nom: 'SD 2', couleur: 'Rouge' })
     })
 
+    it('repasser en saisie libre vide le nom et la couleur venus du club, puis un autre club les remplit', () => {
+      const libre = choisirClub(equipeDuClubA(), null, CLUB_TEST)
+      expect(libre).toMatchObject({ clubId: null, nom: '', couleur: '' })
+      expect(choisirClub(libre, CLUB_B, null)).toMatchObject({ clubId: 'club-b', nom: 'AUDENGE', couleur: 'Blanc' })
+    })
+
+    it('garde un nom saisi à la main en repassant en saisie libre', () => {
+      const libre = choisirClub({ ...equipeDuClubA(), nom: 'SD 2', couleur: 'Rouge' }, null, CLUB_TEST)
+      expect(libre).toMatchObject({ clubId: null, nom: 'SD 2', couleur: 'Rouge' })
+    })
+
     it('rechoisir le même club ne change rien', () => {
       const avant = equipeDuClubA()
       expect(choisirClub(avant, CLUB_TEST, CLUB_TEST)).toEqual(avant)

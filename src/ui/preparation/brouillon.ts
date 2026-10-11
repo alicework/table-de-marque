@@ -90,6 +90,7 @@ function coachCoherent(brouillon: BrouillonEquipe): BrouillonEquipe {
 /**
  * Changer de club retire les lignes venues de l'ancien pool et remplace le nom et la couleur
  * qui étaient ceux de l'ancien club (`precedent`) ; une saisie à la main est conservée.
+ * En repassant en saisie libre (`club` null), le nom et la couleur venus de l'ancien club sont vidés.
  */
 export function choisirClub(
   brouillon: BrouillonEquipe,
@@ -103,9 +104,15 @@ export function choisirClub(
     clubId: club?.id ?? null,
     joueurs: manuelles.length > 0 ? manuelles : [joueurBrouillonVide()],
   })
-  if (!club) return sansPool
   const nomSaisi = brouillon.nom.trim() && brouillon.nom !== precedent?.nom
   const couleurSaisie = brouillon.couleur.trim() && brouillon.couleur !== precedent?.couleurParDefaut
+  if (!club) {
+    return {
+      ...sansPool,
+      nom: nomSaisi ? brouillon.nom : '',
+      couleur: couleurSaisie ? brouillon.couleur : '',
+    }
+  }
   return {
     ...sansPool,
     nom: nomSaisi ? brouillon.nom : club.nom,
