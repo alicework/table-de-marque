@@ -7,9 +7,12 @@ import type { EquipeId, Match } from '../../domain/types'
 interface Props {
   match: Match
   etat: EtatMatch
+  onPossession?: (equipe: EquipeId) => void
 }
 
-export function Bandeau({ match, etat }: Props) {
+export function Bandeau({ match, etat, onPossession }: Props) {
+  // branchée dans la Task 7
+  void onPossession
   const blocEquipe = (equipe: EquipeId) => {
     const nom = match.equipes[equipe].nom
     const fautes = fautesEquipeEnCours(etat, equipe)

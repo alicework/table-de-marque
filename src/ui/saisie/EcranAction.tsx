@@ -1,6 +1,7 @@
 import type { EtatMatch } from '../../domain/etat'
 import { alertesActives } from '../../domain/regles'
 import { EQUIPES, type EquipeId, type Match } from '../../domain/types'
+import { IconeChrono, IconeListe, IconeMaison, IconeRetour } from '../commun/Icones'
 import { decrireEvenement } from '../format'
 import { Alertes } from './Alertes'
 import { Bandeau } from './Bandeau'
@@ -15,6 +16,7 @@ interface Props {
   onFinPeriode: () => void
   onJournal: () => void
   onAccueil: () => void
+  onPossession?: (equipe: EquipeId) => void
 }
 
 const VALEURS = [1, 2, 3] as const
@@ -28,20 +30,22 @@ export function EcranAction({
   onFinPeriode,
   onJournal,
   onAccueil,
+  onPossession,
 }: Props) {
   const derniere = etat.chronologie.at(-1)
   return (
     <section className="ecran ecran-action">
-      <Bandeau match={match} etat={etat} />
+      <Bandeau match={match} etat={etat} onPossession={onPossession} />
       <Alertes alertes={alertesActives(match, etat)} />
       <div className="blocs-equipes">
         {EQUIPES.map((equipe) => (
           <div
             key={equipe}
-            className={`bloc-equipe equipe-${equipe}`}
+            className={`bloc-equipe carte equipe-${equipe}`}
             role="group"
             aria-label={`Actions ${match.equipes[equipe].nom}`}
           >
+            <p className="bloc-titre libelle">{match.equipes[equipe].nom}</p>
             <div className="grille-actions">
               {VALEURS.map((valeur) => (
                 <button
@@ -61,6 +65,7 @@ export function EcranAction({
               </button>
             </div>
             <button className="btn btn-temps-mort" onClick={() => onTempsMort(equipe)}>
+              <IconeChrono />
               Temps mort
             </button>
           </div>
@@ -68,21 +73,36 @@ export function EcranAction({
       </div>
       <p className="derniere-action">
         Dernière action :{' '}
-        {derniere
-          ? `${derniere.scoreA} – ${derniere.scoreB} · ${decrireEvenement(match, derniere.evenement)}`
-          : 'aucune'}
+        {derniere ? (
+          <>
+            <span className="puce">
+              {derniere.scoreA} – {derniere.scoreB}
+            </span>{' '}
+            · <b>{decrireEvenement(match, derniere.evenement)}</b>
+          </>
+        ) : (
+          'aucune'
+        )}
       </p>
       <nav className="barre-basse">
-        <button className="btn btn-discret" disabled={match.evenements.length === 0} onClick={onAnnulerDernier}>
-          ↶ Annuler
+        <button
+          className="btn"
+          aria-label="Annuler la dernière action"
+          disabled={match.evenements.length === 0}
+          onClick={onAnnulerDernier}
+        >
+          <IconeRetour />
+          Annuler
         </button>
-        <button className="btn btn-discret" onClick={onJournal}>
+        <button className="btn" onClick={onJournal}>
+          <IconeListe />
           Journal
         </button>
-        <button className="btn" onClick={onFinPeriode}>
+        <button className="btn btn-principal" onClick={onFinPeriode}>
           Fin de période
         </button>
         <button className="btn btn-discret" onClick={onAccueil}>
+          <IconeMaison />
           Accueil
         </button>
       </nav>

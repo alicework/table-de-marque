@@ -43,7 +43,7 @@ test('un match se saisit, se corrige, survit à un rechargement et se termine', 
   await expect(score).toHaveText('2 – 0')
   await marquer(page, 'GRADIGNAN', '+3', 8)
   await expect(score).toHaveText('2 – 3')
-  await page.getByRole('button', { name: '↶ Annuler' }).click()
+  await page.getByRole('button', { name: 'Annuler la dernière action' }).click()
   await expect(score).toHaveText('2 – 0')
   await attendreGarde(page)
   await marquer(page, 'GRADIGNAN', '+2', 5)

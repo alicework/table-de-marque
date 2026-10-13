@@ -1,10 +1,13 @@
 import { useRef } from 'react'
+import { REGLES } from '../../domain/config'
 import type { EtatMatch } from '../../domain/etat'
 import { parNumero } from '../../domain/match'
 import { niveauFautesJoueur } from '../../domain/regles'
 import type { Match } from '../../domain/types'
 import type { Garder } from '../commun/gardeDoubleTap'
-import { pastillesFautes, pluriel } from '../format'
+import { IconeCroix } from '../commun/Icones'
+import { PastillesFautes } from '../commun/PastillesFautes'
+import { pluriel } from '../format'
 import type { ActionEnAttente } from './types'
 
 interface Props {
@@ -29,14 +32,17 @@ export function ChoixJoueur({ match, etat, action, garder, onChoisir, onAnnuler 
 
   const equipe = match.equipes[action.equipe]
   const stats = etat.equipes[action.equipe]
-  const titre = action.type === 'panier' ? `+${action.valeur} — ${equipe.nom}` : `Faute — ${equipe.nom}`
+  const valeur = action.type === 'panier' ? `+${action.valeur}` : 'Faute'
 
   return (
     <section className="ecran choix-joueur">
       <header className={`bandeau-choix ${action.type === 'panier' ? 'choix-panier' : 'choix-faute'}`}>
-        <h2>{titre}</h2>
+        <h2>
+          <span className="valeur-action">{valeur}</span> — {equipe.nom}
+        </h2>
         <button className="btn" onClick={onAnnuler}>
-          ✕ Annuler
+          <IconeCroix />
+          Annuler
         </button>
       </header>
       <div className="grille-joueurs">
@@ -52,7 +58,7 @@ export function ChoixJoueur({ match, etat, action, garder, onChoisir, onAnnuler 
               onClick={() => garder(choisir)(joueur.id)}
             >
               <span className="tuile-numero">{joueur.numero}</span>
-              <span className="tuile-fautes">{pastillesFautes(fautes)}</span>
+              <PastillesFautes fautes={fautes} />
               <span className="tuile-points">{pluriel(points, 'pt')}</span>
             </button>
           )
@@ -64,7 +70,7 @@ export function ChoixJoueur({ match, etat, action, garder, onChoisir, onAnnuler 
             onClick={() => garder(choisir)(null)}
           >
             <span className="tuile-numero">Coach</span>
-            <span className="tuile-fautes">{'●'.repeat(stats.fautesCoach)}</span>
+            <PastillesFautes fautes={stats.fautesCoach} total={Math.max(stats.fautesCoach, REGLES.fautesPersoMax)} />
           </button>
         )}
       </div>

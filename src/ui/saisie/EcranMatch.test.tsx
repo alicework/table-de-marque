@@ -27,7 +27,9 @@ describe('EcranMatch — saisie', () => {
     expect(screen.getByRole('heading', { name: '+2 — ST DELPHIN' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /^n°7,/ }))
     await attendreScore('2 – 0')
-    expect(screen.getByText(/Dernière action : 2 – 0 · \+2 n°7 ST DELPHIN/)).toBeInTheDocument()
+    expect(screen.getByText(/^Dernière action/).closest('p')).toHaveTextContent(
+      'Dernière action : 2 – 0 · +2 n°7 ST DELPHIN',
+    )
     expect((await lireMatch(id))?.evenements).toHaveLength(1)
   })
 
@@ -43,7 +45,7 @@ describe('EcranMatch — saisie', () => {
     const { user, id } = await afficher()
     await user.click(actions('GRADIGNAN').getByRole('button', { name: '+1' }))
     expect(screen.queryByRole('button', { name: /^Coach/ })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: '✕ Annuler' }))
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
 
     await user.click(actions('GRADIGNAN').getByRole('button', { name: 'Faute' }))
     await user.click(screen.getByRole('button', { name: /^Coach/ }))
@@ -56,15 +58,15 @@ describe('EcranMatch — saisie', () => {
     const { user } = await afficher(...Array.from({ length: 5 }, () => faute('A', 'a11')))
     await user.click(actions('ST DELPHIN').getByRole('button', { name: '+2' }))
     expect(screen.getByRole('button', { name: /^n°11,/ })).toBeDisabled()
-    await user.click(screen.getByRole('button', { name: '✕ Annuler' }))
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
     await user.click(actions('ST DELPHIN').getByRole('button', { name: 'Faute' }))
     expect(screen.getByRole('button', { name: /^n°11,/ })).toBeEnabled()
   })
 
-  it('✕ Annuler revient à l’écran d’action sans rien enregistrer', async () => {
+  it('Annuler revient à l’écran d’action sans rien enregistrer', async () => {
     const { user, id } = await afficher()
     await user.click(actions('ST DELPHIN').getByRole('button', { name: '+3' }))
-    await user.click(screen.getByRole('button', { name: '✕ Annuler' }))
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
     expect(screen.getByLabelText('Score')).toHaveTextContent('0 – 0')
     expect((await lireMatch(id))?.evenements).toHaveLength(0)
   })
@@ -81,7 +83,7 @@ describe('EcranMatch — saisie', () => {
     const { user } = await afficher()
     await user.click(actions('ST DELPHIN').getByRole('button', { name: 'Temps mort' }))
     await waitFor(() => expect(screen.getByLabelText('Temps morts ST DELPHIN')).toHaveTextContent('TM 1'))
-    await user.click(screen.getByRole('button', { name: '↶ Annuler' }))
+    await user.click(screen.getByRole('button', { name: 'Annuler la dernière action' }))
     await waitFor(() => expect(screen.getByLabelText('Temps morts ST DELPHIN')).toHaveTextContent('TM 0'))
   })
 
@@ -160,9 +162,9 @@ describe('garde anti-double-tap', () => {
     await waitFor(() => expect(screen.getByLabelText('Temps morts GRADIGNAN')).toHaveTextContent('TM 1'))
   }
 
-  it('un double tap sur « ↶ Annuler » ne supprime qu’une action', async () => {
+  it('un double tap sur « Annuler la dernière action » ne supprime qu’une action', async () => {
     const { user, id } = await afficher(panier('A', 'a7', 2), panier('B', 'b8', 3))
-    await user.dblClick(screen.getByRole('button', { name: '↶ Annuler' }))
+    await user.dblClick(screen.getByRole('button', { name: 'Annuler la dernière action' }))
     await synchroniser(user)
     expect(screen.getByLabelText('Score')).toHaveTextContent('2 – 0')
     expect((await lireMatch(id))?.evenements).toMatchObject([{ type: 'panier' }, { type: 'tempsMort' }])
@@ -193,7 +195,7 @@ describe('garde anti-double-tap', () => {
     await user.click(actions('ST DELPHIN').getByRole('button', { name: '+2' }))
     avancer(301)
     await user.click(screen.getByRole('button', { name: /^n°7,/ }))
-    await user.click(screen.getByRole('button', { name: '↶ Annuler' }))
+    await user.click(screen.getByRole('button', { name: 'Annuler la dernière action' }))
     await user.click(actions('ST DELPHIN').getByRole('button', { name: '+3' }))
     expect(screen.queryByRole('heading', { name: '+3 — ST DELPHIN' })).not.toBeInTheDocument()
     await synchroniser(user)

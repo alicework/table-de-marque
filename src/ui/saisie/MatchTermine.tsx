@@ -10,7 +10,7 @@ interface Props {
 
 export function MatchTermine({ match, etat, onRouvrir, onAccueil }: Props) {
   return (
-    <section className="ecran match-termine">
+    <section className="ecran match-termine carte">
       <h1>Match terminé</h1>
       <p className="score-final" aria-label="Score final">
         {match.equipes.A.nom} {etat.equipes.A.score} – {etat.equipes.B.score} {match.equipes.B.nom}
