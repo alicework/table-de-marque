@@ -22,8 +22,11 @@ export function GestionJoueurs({ match, appliquer }: Props) {
       {EQUIPES.map((equipe) => {
         const nom = match.equipes[equipe].nom
         return (
-          <section key={equipe} aria-label={`Joueurs ${nom}`}>
-            <h2>{nom}</h2>
+          <section key={equipe} className={`carte equipe-${equipe}`} aria-label={`Joueurs ${nom}`}>
+            <h2 className="titre-carte">
+              <i className="couleur-equipe" aria-hidden="true" />
+              {nom}
+            </h2>
             <ul className="liste-joueurs">
               {[...match.equipes[equipe].joueurs].sort(parNumero).map((joueur) => (
                 <li key={joueur.id}>

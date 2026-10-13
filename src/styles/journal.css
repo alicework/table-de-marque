@@ -1,1 +1,33 @@
-/* Journal — rempli par la Task 9. */
+.journal-periode {
+  color: var(--texte-2);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.journal-score {
+  color: var(--texte-2);
+  min-width: 3.5em;
+  font-weight: 700;
+}
+
+.journal-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.gestion-joueurs {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.gestion-joueurs .carte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.gestion-joueurs .liste-joueurs li {
+  justify-content: space-between;
+}

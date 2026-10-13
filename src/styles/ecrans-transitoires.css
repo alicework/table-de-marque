@@ -1,24 +1,5 @@
 /* Règles d'écran héritées de styles.css, en attendant leur réécriture tâche par tâche. */
 
-/* Journal */
-.journal-periode,
-.journal-score {
-  color: var(--texte-2);
-  min-width: 4.5em;
-}
-
-.journal-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 6px;
-}
-
-.gestion-joueurs {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-
 /* Clubs et équipes (plan 2) */
 .liste-clubs .btn {
   width: 100%;

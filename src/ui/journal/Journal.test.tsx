@@ -62,17 +62,17 @@ describe('Journal', () => {
 
   it('annule la dernière action depuis le journal', async () => {
     const user = await ouvrirJournal(panier('A', 'a7', 2), panier('B', 'b8', 3))
-    await user.click(screen.getByRole('button', { name: '↶ Annuler la dernière action' }))
+    await user.click(screen.getByRole('button', { name: 'Annuler la dernière action' }))
     await waitFor(() => expect(lignes()).toHaveLength(1))
   })
 
-  it('un double tap sur « ↶ Annuler la dernière action » ne supprime qu’une action', async () => {
+  it('un double tap sur « Annuler la dernière action » ne supprime qu’une action', async () => {
     let horloge = 1000
     GARDE_DOUBLE_TAP.delaiMs = 300
     GARDE_DOUBLE_TAP.maintenant = () => horloge
     const user = await ouvrirJournal(panier('A', 'a7', 2), panier('B', 'b8', 3))
     horloge += 301
-    await user.dblClick(screen.getByRole('button', { name: '↶ Annuler la dernière action' }))
+    await user.dblClick(screen.getByRole('button', { name: 'Annuler la dernière action' }))
 
     // Un temps mort accepté plus tard passe par la même file : une fois affiché, l'annulation est enregistrée.
     horloge += 301

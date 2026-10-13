@@ -4,6 +4,7 @@ import type { EtatMatch } from '../../domain/etat'
 import { libellePeriode } from '../../domain/periodes'
 import type { Evenement, Match } from '../../domain/types'
 import { Dialogue } from '../commun/Dialogue'
+import { IconeRetour } from '../commun/Icones'
 import type { Garder } from '../commun/gardeDoubleTap'
 import { decrireEvenement } from '../format'
 import type { Appliquer } from '../useMatch'
@@ -39,15 +40,16 @@ export function Journal({ match, etat, appliquer, garder, onRetour }: Props) {
         disabled={match.evenements.length === 0}
         onClick={garder(() => void appliquer(annulerDernier))}
       >
-        ↶ Annuler la dernière action
+        <IconeRetour />
+        Annuler la dernière action
       </button>
       <ol className="liste-journal" aria-label="Actions du match">
         {[...etat.chronologie].reverse().map(({ evenement, periode, scoreA, scoreB }) => {
           const description = decrireEvenement(match, evenement)
           return (
             <li key={evenement.id}>
-              <span className="journal-periode">{libellePeriode(periode)}</span>
-              <span className="journal-score">
+              <span className="journal-periode puce">{libellePeriode(periode)}</span>
+              <span className="journal-score numerique">
                 {scoreA}–{scoreB}
               </span>
               <span>{description}</span>
