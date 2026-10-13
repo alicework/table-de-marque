@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { listerClubsAvecEffectif } from '../../storage/clubs'
+import { IconeChevron } from '../commun/Icones'
 import { pluriel } from '../format'
 import { DialogueClub } from './DialogueClub'
 import { FicheClub } from './FicheClub'
@@ -27,8 +28,10 @@ export function EcranClubs({ onRetour }: { onRetour: () => void }) {
       <ul className="liste-clubs">
         {clubs?.map(({ club, effectif }) => (
           <li key={club.id}>
-            <button className="btn btn-discret" onClick={() => setClubOuvert(club.id)}>
-              {club.nom} <small>{pluriel(effectif, 'licencié')}</small>
+            <button className="btn btn-club" onClick={() => setClubOuvert(club.id)}>
+              <span className="nom-club">{club.nom}</span>
+              <small className="puce">{pluriel(effectif, 'licencié')}</small>
+              <IconeChevron />
             </button>
           </li>
         ))}

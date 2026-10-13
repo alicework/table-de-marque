@@ -7,7 +7,7 @@ export function ApercuEquipe({ equipe }: { equipe: EquipePartagee }) {
   if (equipe.coach?.type === 'libre') coach = equipe.coach.nom
   if (equipe.coach?.type === 'joueur') coach = nomJoueur(equipe.joueurs[equipe.coach.index])
   return (
-    <div className="apercu-equipe">
+    <div className="apercu-equipe carte">
       <p>
         <strong>{equipe.nom}</strong>
         {equipe.couleur && ` — ${equipe.couleur}`}

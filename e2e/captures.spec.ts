@@ -92,3 +92,42 @@ test('captures des écrans principaux', async ({ page }, infos) => {
   await page.getByRole('button', { name: 'Clubs et licenciés' }).click()
   await capturer('09-clubs')
 })
+
+test('captures des clubs, de la fiche et des dialogues', async ({ page }, infos) => {
+  const dossier = `captures/${infos.project.name}`
+  const capturer = (nom: string) =>
+    page.screenshot({ path: `${dossier}/${nom}.png`, fullPage: true, animations: 'disabled' })
+
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Clubs et licenciés' }).click()
+  await page.getByLabel('Importer un export Webaffiligue').setInputFiles('Sortie_simple_Ufolep.csv')
+  await expect(page.getByRole('dialog', { name: 'Import Webaffiligue' })).toBeVisible()
+  await capturer('10-import-apercu')
+  await page.getByRole('button', { name: 'Importer', exact: true }).click()
+  await page.getByRole('button', { name: 'OK' }).click()
+  await capturer('11-clubs-liste')
+
+  await page.getByRole('button', { name: /SAINT DELPHIN BASKET/ }).click()
+  await expect(page.getByRole('heading', { name: 'SAINT DELPHIN BASKET' })).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Licenciés' })).toBeVisible()
+  await capturer('12-fiche-club')
+  await page.getByRole('button', { name: 'Ajouter un licencié' }).click()
+  await capturer('13-dialogue-licencie')
+  await page.getByRole('button', { name: 'Annuler' }).click()
+  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Retour' }).click()
+
+  await page.getByRole('button', { name: 'Partager une équipe' }).click()
+  const equipe = page.getByRole('group', { name: 'Équipe à partager' })
+  await equipe.getByRole('combobox', { name: 'Club', exact: true }).selectOption({ label: 'SAINT DELPHIN BASKET' })
+  await equipe.getByRole('button', { name: 'Choisir les joueurs du club' }).click()
+  await capturer('14-dialogue-selection')
+  const selection = page.getByRole('dialog', { name: 'Choisir les joueurs' })
+  const cases = selection.getByRole('checkbox')
+  for (let i = 0; i < 5; i++) await cases.nth(i).check()
+  await selection.getByRole('button', { name: 'Valider' }).click()
+  await capturer('15-partage-equipe')
+  await equipe.getByRole('button', { name: 'Partager cette équipe' }).click()
+  await expect(page.getByRole('img', { name: "QR code de l'équipe" })).toBeVisible()
+  await capturer('16-dialogue-qr')
+})
