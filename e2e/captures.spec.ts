@@ -33,7 +33,9 @@ async function marquer(page: Page, equipe: string, bouton: string, numero: numbe
 
 test('captures des écrans principaux', async ({ page }, infos) => {
   const dossier = `captures/${infos.project.name}`
-  const capturer = (nom: string) => page.screenshot({ path: `${dossier}/${nom}.png`, fullPage: true })
+  // animations: 'disabled' termine les fondus d'entrée avant la capture.
+  const capturer = (nom: string) =>
+    page.screenshot({ path: `${dossier}/${nom}.png`, fullPage: true, animations: 'disabled' })
 
   await page.goto('/')
   await capturer('01-accueil-vide')
@@ -73,11 +75,13 @@ test('captures des écrans principaux', async ({ page }, infos) => {
   await attendreGarde(page)
 
   await page.getByRole('button', { name: 'Journal' }).click()
+  await attendreGarde(page)
   await capturer('06-journal')
   await page.getByRole('button', { name: 'Retour au match' }).click()
   await attendreGarde(page)
 
   await page.getByRole('button', { name: 'Fin de période' }).click()
+  await attendreGarde(page)
   await capturer('07-dialogue-fin-periode')
   await page.getByRole('button', { name: 'Annuler', exact: true }).click()
   await attendreGarde(page)

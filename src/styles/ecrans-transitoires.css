@@ -1,12 +1,5 @@
 /* Règles d'écran héritées de styles.css, en attendant leur réécriture tâche par tâche. */
 
-/* Accueil */
-.accueil {
-  max-width: 480px;
-  margin: 10vh auto 0;
-  text-align: center;
-}
-
 /* Préparation */
 .infos-match,
 .equipes-preparation {
