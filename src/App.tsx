@@ -18,7 +18,7 @@ type Ecran =
   | { nom: 'match'; matchId: string }
   | { nom: 'clubs' }
   | { nom: 'partage' }
-  | { nom: 'equipeRecue'; code: string | null }
+  | { nom: 'equipeRecue'; code: string }
 
 interface Props {
   /** Code d'équipe lu dans l'adresse au démarrage (lien partagé). */
@@ -61,7 +61,6 @@ export default function App({ codeEquipe = null }: Props) {
           onReprendre={ouvrirMatch}
           onClubs={() => setEcran({ nom: 'clubs' })}
           onPartager={() => setEcran({ nom: 'partage' })}
-          onImporter={() => setEcran({ nom: 'equipeRecue', code: null })}
         />
       )}
       {ecran.nom === 'preparation' && (

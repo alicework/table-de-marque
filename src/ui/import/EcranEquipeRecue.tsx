@@ -8,13 +8,13 @@ import { ApercuEquipe } from './ApercuEquipe'
 import { ImportEquipe } from './ImportEquipe'
 
 interface Props {
-  codeInitial: string | null
+  /** Code lu dans le lien partagé qui a ouvert l'application. */
+  codeInitial: string
   onUtiliser: (cote: EquipeId, equipe: EquipePartagee) => void
   onRetour: () => void
 }
 
-function lectureInitiale(code: string | null): { equipe: EquipePartagee | null; erreur: string | null } {
-  if (code === null) return { equipe: null, erreur: null }
+function lectureInitiale(code: string): { equipe: EquipePartagee | null; erreur: string | null } {
   try {
     return { equipe: lireCodeEquipe(code), erreur: null }
   } catch (e) {
@@ -39,7 +39,6 @@ export function EcranEquipeRecue({ codeInitial, onUtiliser, onRetour }: Props) {
   }
 
   async function copierCode() {
-    if (codeInitial === null) return
     try {
       await navigator.clipboard.writeText(codeInitial)
       setMessage('Code copié.')
@@ -71,7 +70,8 @@ export function EcranEquipeRecue({ codeInitial, onUtiliser, onRetour }: Props) {
             <div className="note-lien">
               <p className="sous-titre">
                 Ce lien s'est peut-être ouvert dans le navigateur plutôt que dans l'application installée. Dans ce cas,
-                copiez le code puis, dans l'application, choisissez « Importer une équipe ».
+                copiez le code puis, dans l'application, choisissez « Nouveau match » et « Importer une équipe
+                (QR / code) » dans l'équipe concernée.
               </p>
               <button className="btn" onClick={() => void copierCode()}>
                 Copier le code

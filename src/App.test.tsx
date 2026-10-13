@@ -178,17 +178,4 @@ describe('équipe reçue par lien', () => {
     await user.click(await screen.findByRole('button', { name: 'Copier le code' }))
     expect(await navigator.clipboard.readText()).toBe(CODE_GRADIGNAN)
   })
-
-  it("importe une équipe depuis l'accueil", async () => {
-    const user = userEvent.setup()
-    render(<App />)
-    await user.click(await screen.findByRole('button', { name: 'Importer une équipe' }))
-    await user.type(screen.getByLabelText('Coller le lien ou le code'), CODE_GRADIGNAN)
-    await user.click(screen.getByRole('button', { name: 'Lire le code' }))
-    await user.click(screen.getByRole('button', { name: 'Utiliser cette équipe' }))
-    await user.click(await screen.findByRole('button', { name: 'Nouveau match : en équipe A' }))
-    expect(screen.queryByRole('dialog', { name: 'Un match est en cours' })).not.toBeInTheDocument()
-    const groupeA = within(await screen.findByRole('group', { name: 'Équipe A' }))
-    expect(groupeA.getByLabelText("Nom de l'équipe")).toHaveValue('GRADIGNAN')
-  })
 })

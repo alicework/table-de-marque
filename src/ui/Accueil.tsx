@@ -8,10 +8,9 @@ interface Props {
   onReprendre: (matchId: string) => void
   onClubs: () => void
   onPartager: () => void
-  onImporter: () => void
 }
 
-export function Accueil({ onNouveauMatch, onReprendre, onClubs, onPartager, onImporter }: Props) {
+export function Accueil({ onNouveauMatch, onReprendre, onClubs, onPartager }: Props) {
   const enCours = useLiveQuery(() => matchEnCours(), [])
   const [confirmation, setConfirmation] = useState(false)
 
@@ -45,9 +44,6 @@ export function Accueil({ onNouveauMatch, onReprendre, onClubs, onPartager, onIm
       </button>
       <button className="btn" onClick={onPartager}>
         Partager une équipe
-      </button>
-      <button className="btn" onClick={onImporter}>
-        Importer une équipe
       </button>
       {confirmation && (
         <Dialogue
