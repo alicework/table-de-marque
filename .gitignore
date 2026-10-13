@@ -29,3 +29,8 @@ dist-ssr
 *.sw?
 test-results/
 playwright-report/
+
+# Captures de contrôle visuel et artefacts de l'éditeur
+captures/
+.nimbalyst/
+nimbalyst-local/

@@ -1,0 +1,206 @@
+:root {
+  font-family: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fond);
+  color: var(--texte);
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 28px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+p {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+input,
+select,
+textarea {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 44px;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+  color: var(--texte-2);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--espace-4) 20px;
+}
+
+.ecran {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--espace-2);
+}
+
+.sous-titre {
+  color: var(--texte-2);
+}
+
+.chargement {
+  color: var(--texte-2);
+  text-align: center;
+  padding: 48px 0;
+}
+
+/* Petits libellés en capitales (pastilles, titres de bloc). */
+.libelle {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.numerique {
+  font-variant-numeric: tabular-nums;
+}
+
+.puce {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.erreurs,
+.avertissements {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+ul.erreurs,
+ul.avertissements {
+  padding-left: 32px;
+}
+
+.erreurs {
+  background: var(--danger);
+  color: #fff;
+}
+
+.avertissements {
+  background: var(--attention-tint);
+  color: var(--attention);
+}
+
+/* Contenu réservé aux lecteurs d'écran ou aux champs fichier cachés. */
+.masque {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn,
+  .btn-action,
+  .tuile,
+  .possession-cote {
+    transition:
+      transform var(--duree-tap),
+      background-color var(--duree-tap),
+      filter var(--duree-tap);
+  }
+
+  /* Retour visuel immédiat au toucher. */
+  .btn:active:not(:disabled),
+  .btn-action:active:not(:disabled),
+  .tuile:active:not(:disabled),
+  .possession-cote:active {
+    transform: scale(0.97);
+    filter: brightness(0.96);
+  }
+
+  .ecran {
+    animation: fondu var(--duree-ecran) ease-out;
+  }
+
+  .voile {
+    animation: apparition var(--duree-dialogue) ease-out;
+  }
+
+  .dialogue {
+    animation: zoom var(--duree-dialogue) ease-out;
+  }
+}
+
+@keyframes fondu {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}

@@ -1,0 +1,48 @@
+/* Jetons de design — seul fichier contenant des couleurs littérales (spec § 4.1). */
+:root {
+  color-scheme: light;
+
+  --fond: #f5f4f0;
+  --surface: #ffffff;
+  --surface-2: #edece7;
+  --bordure: #e3e1db;
+  --texte: #1d1c1a;
+  --texte-2: #6f6d67;
+
+  /* Un seul accent : l'orange du ballon. Texte blanc sur --accent : 4,8:1. */
+  --accent: #c24f12;
+  --accent-texte: #a8420c;
+  --accent-tint: #fbeadf;
+
+  --equipe-a: #c8463f;
+  --equipe-a-tint: #fbe5e3;
+  --equipe-b: #2d63c4;
+  --equipe-b-tint: #e3ebfa;
+
+  /* Actions : texte foncé sur teinte pastel, chaque couple ≥ 4,5:1. */
+  --points: #1f6b3f;
+  --points-tint: #e1f1e7;
+  --faute: #9a3d2e;
+  --faute-tint: #f8e4df;
+  --temps-mort: #4a4f8c;
+  --temps-mort-tint: #e7e8f6;
+  --attention: #9a6b12;
+  --attention-tint: #fbefd2;
+  --danger: #b42318;
+
+  --ombre: 0 1px 2px rgb(29 28 26 / 0.04), 0 8px 24px rgb(29 28 26 / 0.06);
+  --ombre-basse: 0 1px 2px rgb(29 28 26 / 0.04);
+  --r-carte: 18px;
+  --r-btn: 12px;
+  --r-tuile: 20px;
+
+  --espace-1: 4px;
+  --espace-2: 8px;
+  --espace-3: 12px;
+  --espace-4: 16px;
+  --espace-5: 24px;
+
+  --duree-tap: 120ms;
+  --duree-dialogue: 160ms;
+  --duree-ecran: 180ms;
+}

@@ -1,0 +1,9 @@
+/* Manrope (variable, sous-ensemble latin seulement : le français tient dans Latin-1).
+   Déclarée ici plutôt que via l'index de Fontsource, qui embarquerait aussi cyrillique, grec et vietnamien. */
+@font-face {
+  font-family: 'Manrope Variable';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2') format('woff2-variations');
+}

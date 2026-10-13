@@ -1,0 +1,260 @@
+/* ---------- Boutons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espace-2);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--r-btn);
+  padding: 12px 18px;
+  min-height: 48px;
+  font-weight: 700;
+  color: var(--texte);
+  box-shadow: var(--ombre-basse);
+  cursor: pointer;
+}
+
+.btn-principal {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-discret {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--texte-2);
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.btn:disabled,
+.btn-action:disabled,
+.tuile:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.icone {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+/* ---------- Cartes et petits blocs ---------- */
+.carte {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--r-carte);
+  box-shadow: var(--ombre);
+  padding: var(--espace-4);
+}
+
+.titre-carte {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.couleur-equipe {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--texte-2);
+  flex: none;
+}
+
+.equipe-A .couleur-equipe {
+  background: var(--equipe-a);
+}
+
+.equipe-B .couleur-equipe {
+  background: var(--equipe-b);
+}
+
+.pastille {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--texte-2);
+}
+
+.pastille b {
+  color: var(--texte);
+  font-size: 22px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Voyant des fautes d'équipe : toujours visible, comme sur une table de marque. */
+.fautes-bloc {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--texte-2);
+  border: 1.5px solid transparent;
+}
+
+.fautes-bloc .valeur {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--texte);
+  font-variant-numeric: tabular-nums;
+}
+
+.fautes-bloc .valeur small {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texte-2);
+}
+
+.fautes-bloc.niveau-attention {
+  background: var(--attention-tint);
+  border-color: var(--attention);
+  color: var(--attention);
+}
+
+.fautes-bloc.niveau-attention .valeur,
+.fautes-bloc.niveau-attention .valeur small {
+  color: var(--attention);
+}
+
+.fautes-bloc.niveau-limite {
+  background: var(--attention);
+  border-color: var(--attention);
+  color: var(--texte);
+}
+
+.fautes-bloc.niveau-limite .valeur,
+.fautes-bloc.niveau-limite .valeur small {
+  color: var(--texte);
+}
+
+.fautes-bloc.niveau-penalite {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgb(180 35 24 / 0.18);
+}
+
+.fautes-bloc.niveau-penalite .valeur,
+.fautes-bloc.niveau-penalite .valeur small {
+  color: #fff;
+}
+
+/* Cercles de fautes personnelles. */
+.pastilles-fautes {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.pastilles-fautes i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--attention);
+}
+
+.pastilles-fautes i.pleine {
+  background: var(--attention);
+}
+
+/* ---------- Dialogue ---------- */
+.voile {
+  position: fixed;
+  inset: 0;
+  background: rgb(29 28 26 / 0.45);
+  display: grid;
+  place-items: center;
+  padding: var(--espace-4);
+  z-index: 10;
+}
+
+.dialogue {
+  background: var(--surface);
+  border-radius: var(--r-carte);
+  box-shadow: var(--ombre);
+  padding: 20px;
+  width: min(480px, 100%);
+  max-height: 90dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.dialogue textarea {
+  resize: vertical;
+}
+
+.dialogue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-2);
+}
+
+.dialogue-actions .btn {
+  flex: 1;
+}
+
+/* ---------- Listes ---------- */
+.liste-journal,
+.liste-joueurs,
+.liste-clubs,
+.liste-selection {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.liste-journal li,
+.liste-joueurs li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+/* ---------- Mise à jour ---------- */
+.bandeau-maj {
+  position: fixed;
+  bottom: var(--espace-3);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--r-carte);
+  box-shadow: var(--ombre);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 20;
+}
