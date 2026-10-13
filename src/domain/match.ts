@@ -32,6 +32,7 @@ export function nouveauMatch(
     equipes: params.equipes,
     officiels: { ...OFFICIELS_VIDES },
     evenements: [],
+    possession: null,
     creeLe: horodatage,
     modifieLe: horodatage,
   }

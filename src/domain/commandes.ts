@@ -1,7 +1,7 @@
 import { calculerEtat } from './etat'
 import { nouvelId } from './match'
 import { choixFinPeriode, periodeSuivante, type ChoixFinPeriode } from './periodes'
-import type { Evenement, Match, NouvelEvenement } from './types'
+import type { EquipeId, Evenement, Match, NouvelEvenement } from './types'
 
 export function ajouterEvenement(match: Match, evenement: NouvelEvenement): Match {
   return { ...match, evenements: [...match.evenements, { ...evenement, id: nouvelId() } as Evenement] }
@@ -29,4 +29,10 @@ export function appliquerFinPeriode(match: Match, choix: ChoixFinPeriode): Match
 
 export function rouvrirMatch(match: Match): Match {
   return { ...match, evenements: match.evenements.filter((e) => e.type !== 'finMatch') }
+}
+
+/** La flèche n'est pas un événement : le journal, « Annuler » et les corrections l'ignorent. */
+export function definirPossession(match: Match, equipe: EquipeId): Match {
+  if (match.possession === equipe) return match
+  return { ...match, possession: equipe }
 }

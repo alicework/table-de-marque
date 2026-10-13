@@ -3,11 +3,13 @@ import { debut, faute, matchDeTest, panier } from '../test/fixtures'
 import {
   annulerDernier,
   appliquerFinPeriode,
+  definirPossession,
   remplacerEvenement,
   rouvrirMatch,
   supprimerEvenement,
 } from './commandes'
 import { calculerEtat, fautesEquipeEnCours } from './etat'
+import type { Match } from './types'
 
 describe('opérations sur le journal', () => {
   it('annule la dernière action', () => {
@@ -65,5 +67,36 @@ describe('opérations sur le journal', () => {
     const termine = appliquerFinPeriode(matchDeTest(debut('MT2'), panier('A', 'a7', 2)), 'finMatch')
     expect(calculerEtat(termine).termine).toBe(true)
     expect(calculerEtat(rouvrirMatch(termine)).termine).toBe(false)
+  })
+})
+
+describe('flèche de possession', () => {
+  it('un nouveau match n’a pas de possession définie', () => {
+    expect(matchDeTest().possession).toBeNull()
+  })
+
+  it('se règle sur une équipe sans toucher au journal', () => {
+    const match = matchDeTest(panier('A', 'a7', 2))
+    const suivant = definirPossession(match, 'B')
+    expect(suivant.possession).toBe('B')
+    expect(suivant.evenements).toBe(match.evenements)
+  })
+
+  it('renvoie le même match quand l’équipe est déjà active', () => {
+    const match = definirPossession(matchDeTest(), 'A')
+    expect(definirPossession(match, 'A')).toBe(match)
+  })
+
+  it('survit à « Annuler »', () => {
+    const match = annulerDernier(definirPossession(matchDeTest(panier('A', 'a7', 2)), 'A'))
+    expect(match.possession).toBe('A')
+    expect(match.evenements).toHaveLength(0)
+  })
+
+  it('accepte un match enregistré avant l’ajout du champ', () => {
+    const ancien: Match = { ...matchDeTest() }
+    delete ancien.possession
+    expect(ancien.possession).toBeUndefined()
+    expect(definirPossession(ancien, 'B').possession).toBe('B')
   })
 })

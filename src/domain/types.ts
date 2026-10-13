@@ -60,6 +60,8 @@ export interface Match {
   equipes: Record<EquipeId, EquipeMatch>
   officiels: Officiels
   evenements: Evenement[]
+  /** Flèche de possession alternée, réglée à la main par la table. Absente sur les matchs créés avant son ajout. */
+  possession?: EquipeId | null
   creeLe: string
   modifieLe: string
 }
