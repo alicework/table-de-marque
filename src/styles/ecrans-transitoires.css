@@ -37,67 +37,6 @@
   width: 4.5em;
 }
 
-/* Bandeau */
-.bandeau {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 8px;
-  background: var(--surface);
-  border-radius: 12px;
-  padding: 10px 14px;
-}
-
-.bandeau-equipe {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.bandeau-equipe.equipe-B {
-  text-align: right;
-}
-
-.equipe-A strong {
-  color: var(--equipe-a);
-}
-
-.equipe-B strong {
-  color: var(--equipe-b);
-}
-
-.bandeau-score {
-  text-align: center;
-}
-
-.score {
-  display: block;
-  font-size: clamp(28px, 6vw, 48px);
-  font-weight: 800;
-}
-
-.periode {
-  color: var(--texte-2);
-}
-
-.fautes-equipe.niveau-attention {
-  color: var(--attention);
-  font-weight: 700;
-}
-
-.fautes-equipe.niveau-limite {
-  color: var(--danger);
-  font-weight: 800;
-}
-
-.fautes-equipe.niveau-penalite {
-  color: #fff;
-  background: var(--danger);
-  border-radius: 6px;
-  padding: 0 6px;
-  font-weight: 800;
-}
-
 /* Journal */
 .journal-periode,
 .journal-score {

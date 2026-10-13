@@ -1,5 +1,11 @@
 import { useState, type ReactNode } from 'react'
-import { ajouterEvenement, annulerDernier, appliquerFinPeriode, rouvrirMatch } from '../../domain/commandes'
+import {
+  ajouterEvenement,
+  annulerDernier,
+  appliquerFinPeriode,
+  definirPossession,
+  rouvrirMatch,
+} from '../../domain/commandes'
 import { calculerEtat } from '../../domain/etat'
 import type { ChoixFinPeriode } from '../../domain/periodes'
 import type { EquipeId, NouvelEvenement } from '../../domain/types'
@@ -77,6 +83,7 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
           onFinPeriode={garder(() => setVue({ nom: 'finPeriode' }))}
           onJournal={garder(() => setVue({ nom: 'journal' }))}
           onAccueil={onAccueil}
+          onPossession={garder((equipe: EquipeId) => void appliquer((m) => definirPossession(m, equipe)))}
         />
         {vue.nom === 'finPeriode' && (
           <FinPeriode

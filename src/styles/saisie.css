@@ -1,3 +1,141 @@
+/* ---------- Bandeau de score ---------- */
+.bandeau {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--espace-4);
+  padding: 14px 22px;
+}
+
+.bandeau-equipe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+  min-width: 0;
+}
+
+.bandeau-equipe.equipe-B {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.bandeau-nom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+.bandeau-equipe.equipe-B .bandeau-nom {
+  flex-direction: row-reverse;
+}
+
+.compteurs {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+/* Le voyant de fautes reste côté extérieur pour les deux équipes. */
+.bandeau-equipe.equipe-B .compteurs {
+  flex-direction: row-reverse;
+}
+
+.bandeau-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espace-2);
+  text-align: center;
+}
+
+.score {
+  font-size: clamp(40px, 6vw, 60px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.periode {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--accent-tint);
+  color: var(--accent-texte);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* ---------- Flèche de possession ---------- */
+/* Sur sa propre ligne du bandeau : la colonne du score reste étroite, les noms gardent leur place. */
+.possession {
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.possession-cote {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  min-height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--texte-2);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  min-width: 0;
+  max-width: 200px;
+}
+
+/* Les points de suspension ne s'appliquent pas à un conteneur flex : ils vivent sur le nom. */
+.possession-nom {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.possession-cote .icone {
+  width: 14px;
+  height: 14px;
+}
+
+.possession-cote.equipe-A[aria-pressed='true'] {
+  background: var(--equipe-a-tint);
+  color: var(--equipe-a);
+}
+
+.possession-cote.equipe-B[aria-pressed='true'] {
+  background: var(--equipe-b-tint);
+  color: var(--equipe-b);
+}
+
+.possession-libelle {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--espace-2);
+  color: var(--texte-2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 /* ---------- Alertes ---------- */
 .alertes {
   list-style: none;
@@ -243,6 +381,29 @@
 
 /* ---------- Téléphone ---------- */
 @media (max-width: 600px) {
+  .bandeau {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--espace-3);
+    padding: 14px;
+  }
+
+  .possession-cote {
+    max-width: 130px;
+  }
+
+  .bandeau-score {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .bandeau-nom {
+    font-size: 16px;
+  }
+
+  .fautes-bloc {
+    min-width: 80px;
+  }
+
   .blocs-equipes {
     grid-template-columns: 1fr;
   }

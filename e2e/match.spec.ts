@@ -49,8 +49,14 @@ test('un match se saisit, se corrige, survit à un rechargement et se termine', 
   await marquer(page, 'GRADIGNAN', '+2', 5)
   await expect(score).toHaveText('2 – 2')
 
+  const possessionB = page.getByRole('button', { name: 'Possession GRADIGNAN' })
+  await possessionB.click()
+  await expect(possessionB).toHaveAttribute('aria-pressed', 'true')
+  await attendreGarde(page)
+
   await page.reload()
   await expect(score).toHaveText('2 – 2')
+  await expect(possessionB).toHaveAttribute('aria-pressed', 'true')
 
   await page.getByRole('button', { name: 'Fin de période' }).click()
   await attendreGarde(page)

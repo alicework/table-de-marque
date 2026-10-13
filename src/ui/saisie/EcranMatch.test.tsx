@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { definirPossession } from '../../domain/commandes'
 import type { NouvelEvenement } from '../../domain/types'
 import { db } from '../../storage/db'
 import { enregistrerMatch, lireMatch } from '../../storage/matchs'
@@ -141,6 +142,42 @@ describe('EcranMatch — périodes et alertes', () => {
   })
 })
 
+describe('EcranMatch — flèche de possession', () => {
+  const cote = (nom: string) => screen.getByRole('button', { name: `Possession ${nom}` })
+
+  it('se règle d’un tap et se retrouve dans le match enregistré', async () => {
+    const { user, id } = await afficher()
+    expect(cote('ST DELPHIN')).toHaveAttribute('aria-pressed', 'false')
+    expect(cote('GRADIGNAN')).toHaveAttribute('aria-pressed', 'false')
+    await user.click(cote('GRADIGNAN'))
+    await waitFor(() => expect(cote('GRADIGNAN')).toHaveAttribute('aria-pressed', 'true'))
+    expect(cote('ST DELPHIN')).toHaveAttribute('aria-pressed', 'false')
+    const match = await lireMatch(id)
+    expect(match?.possession).toBe('B')
+    expect(match?.evenements).toHaveLength(0)
+  })
+
+  it('n’est pas touchée par « Annuler la dernière action »', async () => {
+    const { user, id } = await afficher(panier('A', 'a7', 2))
+    await user.click(cote('ST DELPHIN'))
+    await waitFor(() => expect(cote('ST DELPHIN')).toHaveAttribute('aria-pressed', 'true'))
+    await user.click(screen.getByRole('button', { name: 'Annuler la dernière action' }))
+    await attendreScore('0 – 0')
+    expect(cote('ST DELPHIN')).toHaveAttribute('aria-pressed', 'true')
+    expect((await lireMatch(id))?.possession).toBe('A')
+  })
+
+  it('un tap sur le côté déjà actif n’écrit rien', async () => {
+    const match = await enregistrerMatch(definirPossession(matchDeTest(), 'A'))
+    const user = userEvent.setup()
+    render(<EcranMatch matchId={match.id} onAccueil={vi.fn()} />)
+    await screen.findByLabelText('Score')
+    const ecriture = vi.spyOn(db.matchs, 'put')
+    await user.click(cote('ST DELPHIN'))
+    expect(ecriture).not.toHaveBeenCalled()
+  })
+})
+
 describe('garde anti-double-tap', () => {
   // Horloge figée : seul un avancement explicite rouvre la garde.
   let horloge = 1000
@@ -161,6 +198,15 @@ describe('garde anti-double-tap', () => {
     await user.click(actions('GRADIGNAN').getByRole('button', { name: 'Temps mort' }))
     await waitFor(() => expect(screen.getByLabelText('Temps morts GRADIGNAN')).toHaveTextContent('TM 1'))
   }
+
+  it('un tap sur la flèche de possession pendant la garde est ignoré', async () => {
+    const { user, id } = await afficher()
+    await user.click(actions('ST DELPHIN').getByRole('button', { name: 'Temps mort' }))
+    await user.click(screen.getByRole('button', { name: 'Possession GRADIGNAN' }))
+    await synchroniser(user)
+    expect(screen.getByRole('button', { name: 'Possession GRADIGNAN' })).toHaveAttribute('aria-pressed', 'false')
+    expect((await lireMatch(id))?.possession).toBeNull()
+  })
 
   it('un double tap sur « Annuler la dernière action » ne supprime qu’une action', async () => {
     const { user, id } = await afficher(panier('A', 'a7', 2), panier('B', 'b8', 3))
