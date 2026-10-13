@@ -6,11 +6,13 @@ import { alertesActives, niveauFautesEquipe, niveauFautesJoueur } from './regles
 const fautesA = (n: number) => Array.from({ length: n }, (_, i) => faute('A', ['a4', 'a7', 'a9', 'a11'][i % 4]))
 
 describe('règles UFOLEP', () => {
-  it('classe les fautes d’équipe : orange à 7, limite dès 8', () => {
+  it('classe les fautes d’équipe : attention à 7, limite à 8, pénalité dès 9', () => {
+    expect(niveauFautesEquipe(0)).toBe('normal')
     expect(niveauFautesEquipe(6)).toBe('normal')
     expect(niveauFautesEquipe(7)).toBe('attention')
     expect(niveauFautesEquipe(8)).toBe('limite')
-    expect(niveauFautesEquipe(11)).toBe('limite')
+    expect(niveauFautesEquipe(9)).toBe('penalite')
+    expect(niveauFautesEquipe(11)).toBe('penalite')
   })
 
   it('classe les fautes perso : attention à 4, exclu à 5', () => {

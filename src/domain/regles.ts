@@ -3,7 +3,7 @@ import { fautesEquipeEnCours, type EtatMatch } from './etat'
 import { parNumero } from './match'
 import { EQUIPES, type Match } from './types'
 
-export type NiveauFautesEquipe = 'normal' | 'attention' | 'limite'
+export type NiveauFautesEquipe = 'normal' | 'attention' | 'limite' | 'penalite'
 export type NiveauFautesJoueur = 'normal' | 'attention' | 'exclu'
 
 export interface Alerte {
@@ -11,7 +11,9 @@ export interface Alerte {
   message: string
 }
 
+/** Au-delà du seuil (9e faute et suivantes), chaque faute donne 2 lancers francs. */
 export function niveauFautesEquipe(fautes: number): NiveauFautesEquipe {
+  if (fautes > REGLES.seuilFautesEquipe) return 'penalite'
   if (fautes >= REGLES.seuilFautesEquipe) return 'limite'
   if (fautes >= REGLES.alerteFautesEquipe) return 'attention'
   return 'normal'
