@@ -6,12 +6,3 @@ export function lireOctets(fichier: Blob): Promise<Uint8Array> {
     lecteur.readAsArrayBuffer(fichier)
   })
 }
-
-export function lireTexte(fichier: Blob): Promise<string> {
-  return new Promise((resoudre, rejeter) => {
-    const lecteur = new FileReader()
-    lecteur.onload = () => resoudre(String(lecteur.result))
-    lecteur.onerror = () => rejeter(lecteur.error)
-    lecteur.readAsText(fichier)
-  })
-}

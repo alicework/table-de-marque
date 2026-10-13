@@ -1,9 +1,24 @@
 import { useState } from 'react'
 import { lireCodeEquipe, type EquipePartagee } from '../../roster-share/format'
 import { Dialogue } from '../commun/Dialogue'
-import { lireTexte } from '../commun/fichiers'
+import { decoderOctets, lireExportWebaffiligue } from '../../webaffiligue/lireExport'
+import { lireOctets } from '../commun/fichiers'
 import { ApercuEquipe } from './ApercuEquipe'
 import { ScannerQr } from './ScannerQr'
+
+export const MESSAGE_EXPORT_WEBAFFILIGUE =
+  'Ce fichier est un export Webaffiligue (liste des licenciés), pas une équipe partagée. ' +
+  'Importez-le depuis Accueil → Clubs et licenciés → Importer un export Webaffiligue, ' +
+  'puis choisissez les joueurs dans « Nouveau match ».'
+
+function estExportWebaffiligue(octets: Uint8Array): boolean {
+  try {
+    lireExportWebaffiligue(octets)
+    return true
+  } catch {
+    return false
+  }
+}
 
 interface Props {
   onImporter: (equipe: EquipePartagee) => void
@@ -32,11 +47,19 @@ export function ImportEquipe({ onImporter, onFermer, remplacement = false, erreu
 
   async function lireFichier(fichier: File | undefined) {
     if (!fichier) return
+    let octets: Uint8Array
     try {
-      lire(await lireTexte(fichier))
+      octets = await lireOctets(fichier)
     } catch {
       setErreur('Lecture du fichier impossible.')
+      return
     }
+    // Confusion fréquente : l'export des licenciés donné à l'import d'une équipe partagée.
+    if (estExportWebaffiligue(octets)) {
+      setErreur(MESSAGE_EXPORT_WEBAFFILIGUE)
+      return
+    }
+    lire(decoderOctets(octets))
   }
 
   if (equipe) {

@@ -1,9 +1,12 @@
+import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { encoderEquipe, lienEquipe, type EquipePartagee } from '../../roster-share/format'
 import { PreparationMatch } from '../preparation/PreparationMatch'
-import { ImportEquipe } from './ImportEquipe'
+import { ImportEquipe, MESSAGE_EXPORT_WEBAFFILIGUE } from './ImportEquipe'
 import { demarrerScanner } from './scanner'
 import { MESSAGE_CAMERA } from './ScannerQr'
 
@@ -51,6 +54,17 @@ describe('ImportEquipe', () => {
     const { user } = afficher()
     await user.upload(screen.getByLabelText('Choisir un fichier'), new File([`${LIEN}\n`], 'equipe.txt', { type: 'text/plain' }))
     expect(await screen.findByRole('dialog', { name: 'Équipe reçue' })).toBeInTheDocument()
+  })
+
+  it("explique où importer un export Webaffiligue donné par erreur", async () => {
+    const { user, onImporter } = afficher()
+    const csv = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../../Sortie_simple_Ufolep.csv'))
+    await user.upload(
+      screen.getByLabelText('Choisir un fichier'),
+      new File([new Uint8Array(csv)], 'Sortie_simple_Ufolep.csv', { type: 'text/csv' }),
+    )
+    expect(await screen.findByRole('alert')).toHaveTextContent(MESSAGE_EXPORT_WEBAFFILIGUE)
+    expect(onImporter).not.toHaveBeenCalled()
   })
 
   it('lit le QR code scanné par la caméra', async () => {
