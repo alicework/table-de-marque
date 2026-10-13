@@ -1,42 +1,5 @@
 /* Règles d'écran héritées de styles.css, en attendant leur réécriture tâche par tâche. */
 
-/* Préparation */
-.infos-match,
-.equipes-preparation {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-}
-
-.editeur-equipe {
-  border: 1px solid var(--surface-2);
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-}
-
-.table-joueurs {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table-joueurs th {
-  text-align: left;
-  color: var(--texte-2);
-  font-weight: 500;
-}
-
-.table-joueurs input {
-  width: 100%;
-}
-
-.table-joueurs .champ-numero {
-  width: 4.5em;
-}
-
 /* Journal */
 .journal-periode,
 .journal-score {
@@ -57,36 +20,11 @@
 }
 
 /* Clubs et équipes (plan 2) */
-.actions-equipe {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
 .liste-clubs .btn {
   width: 100%;
   display: flex;
   justify-content: space-between;
   text-align: left;
-}
-
-.liste-selection {
-  max-height: 50dvh;
-  overflow-y: auto;
-}
-
-.case {
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  color: var(--texte);
-  min-height: 44px;
-}
-
-.case input {
-  width: 22px;
-  height: 22px;
-  min-height: 0;
 }
 
 .qr {

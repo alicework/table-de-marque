@@ -51,7 +51,7 @@ export function PreparationMatch({ onDemarre, onRetour, equipesInitiales }: Prop
           Retour
         </button>
       </header>
-      <div className="infos-match">
+      <div className="infos-match carte">
         <label>
           Date
           <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />

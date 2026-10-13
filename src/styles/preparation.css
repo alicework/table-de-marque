@@ -1,1 +1,132 @@
-/* Préparation du match — rempli par la Task 8. */
+.infos-match,
+.equipes-preparation {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+/* Deux équipes côte à côte seulement si chacune a la place de son tableau (≥ 440 px). */
+.equipes-preparation {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+}
+
+.infos-match {
+  padding: var(--espace-4) 20px;
+}
+
+.preparation > .btn-principal {
+  min-height: 56px;
+  font-size: 17px;
+}
+
+/* ---------- Éditeur d'équipe ---------- */
+.editeur-equipe {
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  padding: var(--espace-4) 20px 20px;
+}
+
+.editeur-equipe legend {
+  float: left;
+  width: 100%;
+  margin-bottom: var(--espace-2);
+  font-size: 18px;
+  font-weight: 800;
+  padding: 0;
+}
+
+.editeur-equipe legend + * {
+  clear: both;
+}
+
+.actions-equipe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-2);
+}
+
+.actions-equipe .btn-discret {
+  padding-left: 10px;
+  padding-right: 12px;
+}
+
+.defilement-horizontal {
+  overflow-x: auto;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+
+.table-joueurs {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-joueurs input {
+  min-width: 6em;
+}
+
+.table-joueurs select {
+  min-width: 4em;
+}
+
+.table-joueurs th {
+  text-align: left;
+  color: var(--texte-2);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0 4px 6px;
+}
+
+.table-joueurs td {
+  padding: 3px 2px;
+  border-top: 1px solid var(--bordure);
+}
+
+.table-joueurs input,
+.table-joueurs select {
+  width: 100%;
+  border-color: transparent;
+  background: transparent;
+}
+
+.table-joueurs input:focus-visible,
+.table-joueurs select:focus-visible {
+  background: var(--surface);
+  border-color: var(--bordure);
+}
+
+.table-joueurs .champ-numero {
+  width: 4.5em;
+  min-width: 4.5em;
+}
+
+/* ---------- Dialogue de sélection ---------- */
+.liste-selection {
+  max-height: 50dvh;
+  overflow-y: auto;
+  gap: 4px;
+}
+
+.case {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  color: var(--texte);
+  font-weight: 500;
+  min-height: 44px;
+  padding: 0 var(--espace-2);
+  border-radius: 10px;
+}
+
+.case input {
+  width: 22px;
+  height: 22px;
+  min-height: 0;
+  accent-color: var(--accent);
+}
+

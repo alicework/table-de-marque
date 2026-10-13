@@ -15,6 +15,7 @@ import {
   type BrouillonEquipe,
   type JoueurBrouillon,
 } from './brouillon'
+import { IconeCroix, IconePersonnes, IconeQr, IconeTelecharger } from '../commun/Icones'
 import { ImportEquipe } from '../import/ImportEquipe'
 import { DialoguePartage } from '../partage/DialoguePartage'
 import { DialogueSelection } from './DialogueSelection'
@@ -47,7 +48,7 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
   const peutPartager = valeur.nom.trim() !== '' && equipe.joueurs.length > 0
 
   return (
-    <fieldset className="editeur-equipe">
+    <fieldset className="editeur-equipe carte">
       <legend>{titre}</legend>
       <label>
         Club
@@ -72,13 +73,16 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
         </select>
       </label>
       <div className="actions-equipe">
-        <button type="button" className="btn" disabled={!valeur.clubId} onClick={() => setSelection(true)}>
+        <button type="button" className="btn btn-discret" disabled={!valeur.clubId} onClick={() => setSelection(true)}>
+          <IconePersonnes />
           Choisir les joueurs du club
         </button>
-        <button type="button" className="btn" disabled={!peutPartager} onClick={() => setPartage(true)}>
+        <button type="button" className="btn btn-discret" disabled={!peutPartager} onClick={() => setPartage(true)}>
+          <IconeQr />
           Partager cette équipe
         </button>
-        <button type="button" className="btn" onClick={() => setImportation(true)}>
+        <button type="button" className="btn btn-discret" onClick={() => setImportation(true)}>
+          <IconeTelecharger />
           Importer une équipe (QR / code)
         </button>
       </div>
@@ -91,77 +95,79 @@ export function EditeurEquipe({ titre, valeur, onChange, afficherErreurs }: Prop
         <input value={valeur.couleur} onChange={(e) => maj({ couleur: e.target.value })} />
       </label>
 
-      <table className="table-joueurs">
-        <thead>
-          <tr>
-            <th>N°</th>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Licence</th>
-            <th>F/H</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {valeur.joueurs.map((joueur, index) => (
-            <tr key={joueur.id}>
-              <td>
-                <input
-                  className="champ-numero"
-                  aria-label={`N° joueur ${index + 1}`}
-                  inputMode="numeric"
-                  value={joueur.numero}
-                  onChange={(e) => majJoueur(joueur.id, { numero: e.target.value })}
-                />
-              </td>
-              <td>
-                <input
-                  aria-label={`Nom joueur ${index + 1}`}
-                  value={joueur.nom}
-                  onChange={(e) => majJoueur(joueur.id, { nom: e.target.value })}
-                />
-              </td>
-              <td>
-                <input
-                  aria-label={`Prénom joueur ${index + 1}`}
-                  value={joueur.prenom}
-                  onChange={(e) => majJoueur(joueur.id, { prenom: e.target.value })}
-                />
-              </td>
-              <td>
-                <input
-                  aria-label={`Licence joueur ${index + 1}`}
-                  value={joueur.licence}
-                  onChange={(e) => majJoueur(joueur.id, { licence: e.target.value })}
-                />
-              </td>
-              <td>
-                <select
-                  aria-label={`Civilité joueur ${index + 1}`}
-                  value={joueur.civilite ?? ''}
-                  onChange={(e) =>
-                    majJoueur(joueur.id, { civilite: e.target.value === '' ? null : (e.target.value as Civilite) })
-                  }
-                >
-                  <option value="">?</option>
-                  <option value="Mme">F</option>
-                  <option value="M">H</option>
-                </select>
-              </td>
-              <td>
-                <button
-                  type="button"
-                  className="btn btn-discret"
-                  aria-label={`Retirer joueur ${index + 1}`}
-                  onClick={() => maj({ joueurs: valeur.joueurs.filter((j) => j.id !== joueur.id) })}
-                >
-                  ✕
-                </button>
-              </td>
+      <div className="defilement-horizontal">
+        <table className="table-joueurs">
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Nom</th>
+              <th>Prénom</th>
+              <th>Licence</th>
+              <th>F/H</th>
+              <th />
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {valeur.joueurs.map((joueur, index) => (
+              <tr key={joueur.id}>
+                <td>
+                  <input
+                    className="champ-numero"
+                    aria-label={`N° joueur ${index + 1}`}
+                    inputMode="numeric"
+                    value={joueur.numero}
+                    onChange={(e) => majJoueur(joueur.id, { numero: e.target.value })}
+                  />
+                </td>
+                <td>
+                  <input
+                    aria-label={`Nom joueur ${index + 1}`}
+                    value={joueur.nom}
+                    onChange={(e) => majJoueur(joueur.id, { nom: e.target.value })}
+                  />
+                </td>
+                <td>
+                  <input
+                    aria-label={`Prénom joueur ${index + 1}`}
+                    value={joueur.prenom}
+                    onChange={(e) => majJoueur(joueur.id, { prenom: e.target.value })}
+                  />
+                </td>
+                <td>
+                  <input
+                    aria-label={`Licence joueur ${index + 1}`}
+                    value={joueur.licence}
+                    onChange={(e) => majJoueur(joueur.id, { licence: e.target.value })}
+                  />
+                </td>
+                <td>
+                  <select
+                    aria-label={`Civilité joueur ${index + 1}`}
+                    value={joueur.civilite ?? ''}
+                    onChange={(e) =>
+                      majJoueur(joueur.id, { civilite: e.target.value === '' ? null : (e.target.value as Civilite) })
+                    }
+                  >
+                    <option value="">?</option>
+                    <option value="Mme">F</option>
+                    <option value="M">H</option>
+                  </select>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn btn-discret"
+                    aria-label={`Retirer joueur ${index + 1}`}
+                    onClick={() => maj({ joueurs: valeur.joueurs.filter((j) => j.id !== joueur.id) })}
+                  >
+                    <IconeCroix />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <button
         type="button"
         className="btn"
