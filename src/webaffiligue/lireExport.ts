@@ -88,10 +88,15 @@ export function decouperCsv(texte: string, separateur: string): string[][] {
   return lignes.filter((cellules) => cellules.some((cellule) => cellule.trim() !== ''))
 }
 
+/**
+ * Webaffiligue écrit les valeurs comme des formules Excel ="…". Selon l'export, elles sont
+ * entourées de guillemets CSV ("=""…""" → ="…") ou non (="…" → =… une fois les guillemets lus).
+ */
 export function nettoyerValeur(brute: string): string {
   const valeur = brute.trim()
   const formule = /^="(.*)"$/s.exec(valeur)
-  return (formule ? formule[1] : valeur).trim()
+  if (formule) return formule[1].trim()
+  return valeur.startsWith('=') ? valeur.slice(1).trim() : valeur
 }
 
 export function normaliserEntete(entete: string): string {

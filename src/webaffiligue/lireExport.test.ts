@@ -31,6 +31,11 @@ describe('utilitaires CSV', () => {
     expect(nettoyerValeur(' Oui ')).toBe('Oui')
   })
 
+  it('retire le « = » laissé quand la formule n’est pas entourée de guillemets CSV', () => {
+    // ="033_1" non encapsulé : le découpage CSV consomme les guillemets et laisse =033_1
+    expect(decouperCsv('="033_1";="Martin";Oui', ';')[0].map(nettoyerValeur)).toEqual(['033_1', 'Martin', 'Oui'])
+  })
+
   it('normalise les intitulés de colonnes', () => {
     expect(normaliserEntete('N° Adherent')).toBe('n adherent')
     expect(normaliserEntete('Prénom')).toBe('prenom')
@@ -57,6 +62,21 @@ describe('lireExportWebaffiligue', () => {
     expect(clubs[0].licencies.at(-1)?.licence).toBe('ZZ00000005')
     expect(clubs[0].licencies.filter((l) => l.civilite === 'Mme')).toHaveLength(6)
     expect(clubs[0].licencies.filter((l) => l.typeLicence === 'Loisirs')).toHaveLength(1)
+  })
+
+  it('lit un export dont les valeurs ="…" ne sont pas entourées de guillemets, sans aucun « = »', () => {
+    const texte =
+      '="N° Association";="Nom association";="Type licence";="N° Adherent";="Civilite";="Nom";="Prénom"\n' +
+      '="033550002";="SAINT DELPHIN BASKET";="Loisirs";="033_1";="Mme";="Lefèvre";="Bérénice"\n'
+    const { clubs } = lireExportWebaffiligue(latin1(texte))
+    expect(clubs[0]).toMatchObject({ numeroAssociation: '033550002', nom: 'SAINT DELPHIN BASKET' })
+    expect(clubs[0].licencies[0]).toEqual({
+      licence: '033_1',
+      nom: 'Lefèvre',
+      prenom: 'Bérénice',
+      civilite: 'Mme',
+      typeLicence: 'Loisirs',
+    })
   })
 
   it('lit les noms accentués en ISO-8859-1', () => {
