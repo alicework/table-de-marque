@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { EtatMatch } from '../../domain/etat'
 import type { Match } from '../../domain/types'
 import { courrielFeuille, nomFichierFeuille } from '../../pdf/courriel'
 import { Dialogue } from '../commun/Dialogue'
-import { enregistrerFichier, genererFeuillePdf } from './feuille'
+import { enregistrerFichier, genererFeuillePdf, prechargerFeuille } from './feuille'
 
 interface Props {
   match: Match
@@ -17,6 +17,11 @@ export function EnvoiFeuille({ match, etat }: Props) {
   const [coachAdverse, setCoachAdverse] = useState('')
   const [enCours, setEnCours] = useState(false)
   const [erreur, setErreur] = useState<string | null>(null)
+
+  // Préchargement silencieux : au clic, la génération est brève et le menu de partage natif accepte encore le geste.
+  useEffect(() => {
+    prechargerFeuille().catch(() => undefined)
+  }, [])
 
   const adresse = coachAdverse.trim()
   const adresseValide = adresse === '' || ADRESSE_VALIDE.test(adresse)

@@ -1,17 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { definirOfficiels } from '../../domain/commandes'
 import { OFFICIELS_VIDES } from '../../domain/match'
-import type { Match } from '../../domain/types'
+import type { Officiels } from '../../domain/types'
 import { matchDeTest } from '../../test/fixtures'
-import type { Appliquer } from '../useMatch'
 import { FormulaireOfficiels } from './FormulaireOfficiels'
 
-function afficher(match: Match = matchDeTest()) {
-  const appliquer = vi.fn<Appliquer>(async () => null)
-  render(<FormulaireOfficiels match={match} appliquer={appliquer} />)
-  return { appliquer, user: userEvent.setup() }
+function afficher(officiels: Officiels = OFFICIELS_VIDES) {
+  const onChange = vi.fn<(officiels: Officiels) => void>()
+  render(<FormulaireOfficiels match={matchDeTest()} officiels={officiels} onChange={onChange} />)
+  return { onChange, user: userEvent.setup() }
 }
 
 describe('FormulaireOfficiels', () => {
@@ -28,18 +26,14 @@ describe('FormulaireOfficiels', () => {
     expect(document.querySelector('details')).not.toHaveAttribute('open')
   })
 
-  it('enregistre les officiels à la perte de focus', async () => {
-    const { appliquer, user } = afficher()
-    await user.type(screen.getByLabelText('Arbitre'), 'Camille R.')
-    expect(appliquer).not.toHaveBeenCalled()
-    await user.tab()
-    expect(appliquer).toHaveBeenCalledTimes(1)
-    const operation = appliquer.mock.calls[0][0]
-    expect(operation(matchDeTest()).officiels).toEqual({ ...OFFICIELS_VIDES, arbitre: 'Camille R.' })
+  it('remonte chaque frappe au parent avec les sept valeurs', async () => {
+    const { onChange, user } = afficher()
+    await user.type(screen.getByLabelText('Arbitre'), 'C')
+    expect(onChange).toHaveBeenCalledWith({ ...OFFICIELS_VIDES, arbitre: 'C' })
   })
 
-  it('reprend les officiels déjà enregistrés', () => {
-    afficher(definirOfficiels(matchDeTest(), { ...OFFICIELS_VIDES, marqueur: 'Alex' }))
+  it('affiche les valeurs reçues', () => {
+    afficher({ ...OFFICIELS_VIDES, marqueur: 'Alex' })
     expect(screen.getByLabelText('Marqueur')).toHaveValue('Alex')
     expect(screen.getByLabelText('Capitaine A (ST DELPHIN)')).toHaveValue('')
   })

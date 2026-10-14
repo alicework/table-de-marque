@@ -62,7 +62,6 @@ export function EcranMatch({ matchId, onAccueil }: Props) {
     contenu = (
       <MatchTermine
         match={match}
-        etat={etat}
         appliquer={appliquer}
         onRouvrir={garder(() => void appliquer(rouvrirMatch))}
         onAccueil={onAccueil}

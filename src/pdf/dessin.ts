@@ -21,11 +21,13 @@ const CASE = 7
 const PAS_CASE = 10
 
 /** Hauteurs fixes (hors lignes de tableau), pour calculer la hauteur de ligne qui fait tenir la feuille sur une page. */
-const HAUTEUR_EN_TETE = 52
-const HAUTEUR_SCORE = 64
+const HAUTEUR_EN_TETE = 48
+const HAUTEUR_SCORE = 60
 const HAUTEUR_TITRE_EQUIPE = 30
-const HAUTEUR_TITRE_OFFICIELS = 20
-const HAUTEUR_CASE_OFFICIEL = 26
+const HAUTEUR_TITRE_OFFICIELS = 16
+/** Libellé 7 pt puis une case de 22 pt, assez haute pour une signature au stylo. */
+const HAUTEUR_CASE_OFFICIEL = 33
+const HAUTEUR_SIGNATURE = 22
 const ESPACE = 12
 
 type Alignement = 'gauche' | 'droite' | 'centre'
@@ -354,8 +356,8 @@ function dessinerOfficiels(f: Feuille, m: ModeleFeuille) {
     const x = MARGE + (i % 2) * (largeur + ESPACE)
     const y = f.y + Math.floor(i / 2) * HAUTEUR_CASE_OFFICIEL
     f.texte(officiel.libelle, { x, y: y + 7, taille: 7, couleur: 'texte-2', largeur })
-    f.rectangle(x, y + 10, largeur, 15, { bordure: 'bordure' })
-    if (officiel.valeur) f.texte(officiel.valeur, { x: x + 3, y: y + 21, taille: 9, largeur: largeur - 6 })
+    f.rectangle(x, y + 9, largeur, HAUTEUR_SIGNATURE, { bordure: 'bordure' })
+    if (officiel.valeur) f.texte(officiel.valeur, { x: x + 3, y: y + 24, taille: 9, largeur: largeur - 6 })
   })
   f.y += rangees * HAUTEUR_CASE_OFFICIEL
 }

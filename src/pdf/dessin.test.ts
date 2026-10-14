@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { inflateSync } from 'node:zlib'
 import { resolve } from 'node:path'
 import { PDFDocument } from 'pdf-lib'
 import { describe, expect, it } from 'vitest'
@@ -15,13 +16,32 @@ const POLICES = { normale: police('Manrope-Regular.ttf'), grasse: police('Manrop
 const MAINTENANT = new Date(2026, 9, 16, 21, 5)
 const SORTIE = resolve(import.meta.dirname, '../../test-results')
 
+let derniersOctets: Uint8Array = new Uint8Array()
+
 async function dessiner(match: Match, nomExemple?: string) {
   const octets = await dessinerFeuille(composerFeuille(match, calculerEtat(match), MAINTENANT), POLICES)
+  derniersOctets = octets
   if (nomExemple) {
     mkdirSync(SORTIE, { recursive: true })
     writeFileSync(resolve(SORTIE, nomExemple), octets)
   }
   return PDFDocument.load(octets)
+}
+
+/** Hauteurs de tous les rectangles des flux de contenu, décompressés (pdf-lib les trace en « 0 0 m / 0 h l / l h l… »). */
+function hauteursRectangles(octets: Uint8Array): number[] {
+  const brut = Buffer.from(octets).toString('latin1')
+  const hauteurs: number[] = []
+  for (const m of brut.matchAll(/stream\r?\n([\s\S]*?)\r?\nendstream/g)) {
+    let contenu: string
+    try {
+      contenu = inflateSync(Buffer.from(m[1], 'latin1')).toString('latin1')
+    } catch {
+      contenu = m[1]
+    }
+    for (const r of contenu.matchAll(/0 0 m\n0 ([-\d.]+) l\n[-\d.]+ \1 l\n/g)) hauteurs.push(Number(r[1]))
+  }
+  return hauteurs
 }
 
 const quatorze = (prefixe: string): JoueurMatch[] =>
@@ -58,6 +78,11 @@ describe('dessinerFeuille', () => {
     const { width, height } = doc.getPage(0).getSize()
     expect([Math.round(width), Math.round(height)]).toEqual([595, 842])
     expect(doc.getTitle()).toBe('Feuille de match — ST DELPHIN – GRADIGNAN')
+  })
+
+  it('dessine sept cases d’officiels de 22 pt, signables au stylo', async () => {
+    await dessiner(matchDeTest())
+    expect(hauteursRectangles(derniersOctets).filter((h) => h === 22)).toHaveLength(7)
   })
 
   it('tient sur une ou deux pages avec 14 joueurs par équipe et deux prolongations', async () => {

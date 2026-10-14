@@ -7,7 +7,11 @@ import { matchDeTest, panier } from '../../test/fixtures'
 import { EnvoiFeuille } from './EnvoiFeuille'
 import { enregistrerFichier, genererFeuillePdf } from './feuille'
 
-vi.mock('./feuille', () => ({ genererFeuillePdf: vi.fn(), enregistrerFichier: vi.fn() }))
+vi.mock('./feuille', () => ({
+  genererFeuillePdf: vi.fn(),
+  enregistrerFichier: vi.fn(),
+  prechargerFeuille: vi.fn(async () => undefined),
+}))
 
 const generer = vi.mocked(genererFeuillePdf)
 const enregistrer = vi.mocked(enregistrerFichier)

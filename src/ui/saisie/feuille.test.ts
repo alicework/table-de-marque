@@ -1,11 +1,21 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { calculerEtat } from '../../domain/etat'
 import { matchDeTest } from '../../test/fixtures'
-import { enregistrerFichier, genererFeuillePdf } from './feuille'
 
 const OCTETS = new Uint8Array([37, 80, 68, 70])
+
+/** Le module garde en cache le préchargement : chaque test repart d'une instance neuve. */
+type ModuleFeuille = typeof import('./feuille')
+let feuille: ModuleFeuille
+beforeEach(async () => {
+  vi.resetModules()
+  feuille = await import('./feuille')
+})
+const enregistrerFichier: ModuleFeuille['enregistrerFichier'] = (...args) => feuille.enregistrerFichier(...args)
+const genererFeuillePdf: ModuleFeuille['genererFeuillePdf'] = (...args) => feuille.genererFeuillePdf(...args)
+const prechargerFeuille: ModuleFeuille['prechargerFeuille'] = () => feuille.prechargerFeuille()
 
 function simulerTelechargement() {
   const creer = vi.fn((_fichier: Blob | MediaSource) => 'blob:feuille')
@@ -88,5 +98,34 @@ describe('genererFeuillePdf', () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response(null, { status: 404 })))
     const match = matchDeTest()
     await expect(genererFeuillePdf(match, calculerEtat(match))).rejects.toThrow(/Police introuvable/)
+  })
+})
+
+describe('prechargerFeuille', () => {
+  it('charge le module et les polices une seule fois, réutilisés par la génération', async () => {
+    const police = (fichier: string) => readFileSync(resolve(import.meta.dirname, '../../pdf/polices', fichier))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => new Response(police(url.includes('Bold') ? 'Manrope-Bold.ttf' : 'Manrope-Regular.ttf'))),
+    )
+    await prechargerFeuille()
+    await prechargerFeuille()
+    const match = matchDeTest()
+    const octets = await genererFeuillePdf(match, calculerEtat(match))
+    expect(new TextDecoder().decode(octets.subarray(0, 4))).toBe('%PDF')
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
+
+  it('un préchargement en échec ne bloque pas une nouvelle tentative', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(null, { status: 404 })))
+    await expect(prechargerFeuille()).rejects.toThrow(/Police introuvable/)
+    const police = (fichier: string) => readFileSync(resolve(import.meta.dirname, '../../pdf/polices', fichier))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => new Response(police(url.includes('Bold') ? 'Manrope-Bold.ttf' : 'Manrope-Regular.ttf'))),
+    )
+    const match = matchDeTest()
+    const octets = await genererFeuillePdf(match, calculerEtat(match))
+    expect(new TextDecoder().decode(octets.subarray(0, 4))).toBe('%PDF')
   })
 })

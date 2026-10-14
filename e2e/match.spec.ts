@@ -80,7 +80,6 @@ test('un match se saisit, se corrige, survit à un rechargement et se termine', 
 
   await page.getByText('Officiels et capitaines').click()
   await page.getByLabel('Arbitre', { exact: true }).fill('Camille R.')
-  await page.getByLabel('Arbitre', { exact: true }).blur()
 
   const telechargement = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Enregistrer le PDF' }).click()

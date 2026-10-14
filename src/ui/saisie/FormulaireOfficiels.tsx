@@ -1,12 +1,10 @@
-import { useState } from 'react'
-import { definirOfficiels } from '../../domain/commandes'
-import { OFFICIELS_VIDES } from '../../domain/match'
 import type { Match, Officiels } from '../../domain/types'
-import type { Appliquer } from '../useMatch'
 
 interface Props {
   match: Match
-  appliquer: Appliquer
+  /** Valeurs affichées : l'écran parent les détient, pour que le PDF et l'e-mail voient la dernière frappe. */
+  officiels: Officiels
+  onChange: (officiels: Officiels) => void
 }
 
 const CHAMPS: { cle: keyof Officiels; libelle: (match: Match) => string }[] = [
@@ -19,11 +17,8 @@ const CHAMPS: { cle: keyof Officiels; libelle: (match: Match) => string }[] = [
   { cle: 'capitaineB', libelle: (match) => `Capitaine B (${match.equipes.B.nom})` },
 ]
 
-/** Sept champs facultatifs, enregistrés dans le match à la perte de focus. État local pour ne jamais perdre une frappe. */
-export function FormulaireOfficiels({ match, appliquer }: Props) {
-  const [officiels, setOfficiels] = useState<Officiels>({ ...OFFICIELS_VIDES, ...match.officiels })
-  const enregistrer = () => void appliquer((m) => definirOfficiels(m, officiels))
-
+/** Sept champs facultatifs, repliés par défaut. Composant contrôlé : chaque frappe remonte au parent. */
+export function FormulaireOfficiels({ match, officiels, onChange }: Props) {
   return (
     <details className="officiels">
       <summary>Officiels et capitaines</summary>
@@ -34,8 +29,7 @@ export function FormulaireOfficiels({ match, appliquer }: Props) {
             <input
               value={officiels[cle]}
               autoComplete="off"
-              onChange={(e) => setOfficiels({ ...officiels, [cle]: e.target.value })}
-              onBlur={enregistrer}
+              onChange={(e) => onChange({ ...officiels, [cle]: e.target.value })}
             />
           </label>
         ))}
