@@ -8,3 +8,10 @@ export const REGLES = {
   numeroMin: 0,
   numeroMax: 99,
 } as const
+
+/** Durée des arrêts de jeu, en secondes. */
+export const PAUSES = {
+  tempsMort: 60,
+  miTemps: 600,
+  avantProlongation: 120,
+} as const

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { debut, matchDeTest, panier } from '../test/fixtures'
 import { calculerEtat } from './etat'
-import { choixFinPeriode, libellePeriode, periodeSuivante } from './periodes'
+import { choixFinPeriode, libellePeriode, pauseAvant, periodeSuivante } from './periodes'
 
 describe('périodes', () => {
   it('propose seulement la 2ème mi-temps à la fin de la 1ère', () => {
@@ -32,5 +32,18 @@ describe('périodes', () => {
     expect(libellePeriode('MT2')).toBe('2ème mi-temps')
     expect(libellePeriode('P1')).toBe('Prolongation')
     expect(libellePeriode('P2')).toBe('Prolongation 2')
+  })
+
+  it('ne prévoit pas de pause avant la 1ère mi-temps', () => {
+    expect(pauseAvant('MT1')).toBeNull()
+  })
+
+  it('prévoit 10 min de mi-temps avant la 2ème mi-temps', () => {
+    expect(pauseAvant('MT2')).toEqual({ titre: 'Mi-temps', secondes: 600 })
+  })
+
+  it('prévoit 2 min avant chaque prolongation', () => {
+    expect(pauseAvant('P1')).toEqual({ titre: 'Avant la prolongation', secondes: 120 })
+    expect(pauseAvant('P2')).toEqual({ titre: 'Avant la prolongation', secondes: 120 })
   })
 })

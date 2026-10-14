@@ -1,3 +1,4 @@
+import { PAUSES } from './config'
 import type { EtatMatch } from './etat'
 import type { Periode } from './types'
 
@@ -21,4 +22,17 @@ export function libellePeriode(periode: Periode): string {
   if (periode === 'MT2') return '2ème mi-temps'
   const numero = Number(periode.slice(1))
   return numero === 1 ? 'Prolongation' : `Prolongation ${numero}`
+}
+
+export interface Pause {
+  /** Titre de la popup. */
+  titre: string
+  secondes: number
+}
+
+/** Arrêt qui précède `periode`, ou null s'il n'y en a pas. */
+export function pauseAvant(periode: Periode): Pause | null {
+  if (periode === 'MT1') return null
+  if (periode === 'MT2') return { titre: 'Mi-temps', secondes: PAUSES.miTemps }
+  return { titre: 'Avant la prolongation', secondes: PAUSES.avantProlongation }
 }
