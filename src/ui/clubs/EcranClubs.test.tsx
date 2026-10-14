@@ -32,6 +32,7 @@ describe('EcranClubs', () => {
 
   it("propose le lien direct vers l'extraction des adhérents LiguAsso", async () => {
     await afficher()
+    expect(screen.getByText(/type de sortie « Sortie simple Ufolep »/)).toBeInTheDocument()
     const lien = screen.getByRole('link', { name: /Ouvrir l'extraction des adhérents/ })
     expect(lien).toHaveAttribute('href', 'https://www.liguasso.org/LAPOOL5/Pages/Private/Extractions/AdhExtract.aspx')
     expect(lien).toHaveAttribute('target', '_blank')

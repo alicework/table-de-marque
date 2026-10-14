@@ -47,8 +47,8 @@ export function EcranClubs({ onRetour }: { onRetour: () => void }) {
       </div>
       <div className="note-lien">
         <p className="sous-titre">
-          L'export se récupère sur LiguAsso : Statistiques et Extractions → Extractions → Extraction adhérents, au
-          format CSV.
+          L'export se récupère sur LiguAsso : Statistiques et Extractions → Extractions → Extraction adhérents, avec
+          le type de sortie « Sortie simple Ufolep ».
         </p>
         <a className="btn" href={EXTRACTION_LIGUASSO} target="_blank" rel="noopener noreferrer">
           <IconeLienExterne />

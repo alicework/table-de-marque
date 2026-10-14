@@ -58,7 +58,7 @@ Deux possibilités :
 1. Connectez-vous à **LiguAsso** avec le compte de l'association.
 2. Ouvrez le menu **Statistiques et Extractions** → **Extractions** → **Extraction adhérents**.
    Si le menu ne s'ouvre pas (cas de Firefox), utilisez le lien direct : [Extraction adhérents sur LiguAsso](https://www.liguasso.org/LAPOOL5/Pages/Private/Extractions/AdhExtract.aspx). Il est aussi proposé dans l'application, sur l'écran **Clubs et licenciés** (bouton **Ouvrir l'extraction des adhérents**).
-3. Exportez la liste des adhérents au format **CSV**.
+3. Dans le formulaire, choisissez **Type de sortie** : **Sortie simple Ufolep**, puis lancez l'export (fichier **CSV**).
 4. Enregistrez le fichier sur l'appareil qui servira de table de marque (téléchargement, e-mail, cloud…).
 
 Le fichier doit contenir au minimum les colonnes suivantes (c'est le cas de l'export standard) :
