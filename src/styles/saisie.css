@@ -380,6 +380,67 @@
   font-variant-numeric: tabular-nums;
 }
 
+.match-termine .officiels,
+.match-termine .envoi-feuille {
+  text-align: left;
+}
+
+.officiels {
+  background: var(--surface-2);
+  border-radius: var(--r-btn);
+  padding: 12px 16px;
+}
+
+.officiels summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.grille-champs {
+  display: grid;
+  gap: var(--espace-3);
+  margin-top: var(--espace-3);
+}
+
+.envoi-feuille {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.envoi-feuille h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.actions-feuille {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-2);
+}
+
+.actions-feuille .btn {
+  flex: 1 1 200px;
+}
+
+.aide {
+  margin: 0;
+  color: var(--texte-2);
+  font-size: 14px;
+}
+
+.aide code {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 480px) {
+  .grille-champs {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 /* ---------- Téléphone ---------- */
 @media (max-width: 600px) {
   .bandeau {

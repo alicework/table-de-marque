@@ -7,8 +7,8 @@ export default defineConfig({
   // Chemin de publication : `/` en local, `/table-de-marque/` sur GitHub Pages (fourni par la CI).
   base: process.env.BASE_PATH ?? '/',
   build: {
-    // pdf-lib (~500 Ko) vit dans son propre morceau, chargé seulement à la génération de la feuille.
-    chunkSizeWarningLimit: 1000,
+    // pdf-lib et fontkit (~1,1 Mo) vivent dans leur propre morceau, chargé seulement à la génération de la feuille.
+    chunkSizeWarningLimit: 1200,
   },
   plugins: [
     react(),
