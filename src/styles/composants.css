@@ -141,12 +141,12 @@
 .fautes-bloc.niveau-limite {
   background: var(--attention);
   border-color: var(--attention);
-  color: var(--texte);
+  color: #fff;
 }
 
 .fautes-bloc.niveau-limite .valeur,
 .fautes-bloc.niveau-limite .valeur small {
-  color: var(--texte);
+  color: #fff;
 }
 
 .fautes-bloc.niveau-penalite {

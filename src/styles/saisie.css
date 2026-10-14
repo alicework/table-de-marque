@@ -62,7 +62,8 @@
   white-space: nowrap;
 }
 
-.periode {
+/* Portée limitée au bandeau : la carte d'accueil a sa propre période, sans pastille. */
+.bandeau-score .periode {
   display: inline-block;
   padding: 4px 12px;
   border-radius: 999px;
@@ -91,7 +92,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  min-height: 36px;
+  min-height: 48px;
   border: none;
   background: transparent;
   color: var(--texte-2);

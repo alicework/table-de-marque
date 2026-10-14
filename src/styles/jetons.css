@@ -7,14 +7,14 @@
   --surface-2: #edece7;
   --bordure: #e3e1db;
   --texte: #1d1c1a;
-  --texte-2: #6f6d67;
+  --texte-2: #66645e;
 
   /* Un seul accent : l'orange du ballon. Texte blanc sur --accent : 4,8:1. */
   --accent: #c24f12;
   --accent-texte: #a8420c;
   --accent-tint: #fbeadf;
 
-  --equipe-a: #c8463f;
+  --equipe-a: #b83c35;
   --equipe-a-tint: #fbe5e3;
   --equipe-b: #2d63c4;
   --equipe-b-tint: #e3ebfa;
@@ -26,7 +26,7 @@
   --faute-tint: #f8e4df;
   --temps-mort: #4a4f8c;
   --temps-mort-tint: #e7e8f6;
-  --attention: #9a6b12;
+  --attention: #86590e;
   --attention-tint: #fbefd2;
   --danger: #b42318;
 

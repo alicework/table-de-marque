@@ -47,7 +47,7 @@ Toutes les valeurs ci-dessous sont des variables CSS sur `:root`. Le code n'util
 | `--surface-2` | `#edece7` | Pastilles neutres, icônes d'accueil, fond des champs dans un dialogue |
 | `--bordure` | `#e3e1db` | Bordures fines des cartes et boutons |
 | `--texte` | `#1d1c1a` | Texte principal |
-| `--texte-2` | `#6f6d67` | Texte secondaire, libellés |
+| `--texte-2` | `#66645e` | Texte secondaire, libellés |
 
 **Accent (un seul)**
 
@@ -61,7 +61,7 @@ Toutes les valeurs ci-dessous sont des variables CSS sur `:root`. Le code n'util
 
 | Jeton | Valeur |
 |---|---|
-| `--equipe-a` / `--equipe-a-tint` | `#c8463f` / `#fbe5e3` |
+| `--equipe-a` / `--equipe-a-tint` | `#b83c35` / `#fbe5e3` |
 | `--equipe-b` / `--equipe-b-tint` | `#2d63c4` / `#e3ebfa` |
 
 **Actions et états.** Chaque action a une teinte de fond pastel et une couleur de texte foncée ; le texte foncé sur la teinte dépasse 4,5:1.
@@ -71,7 +71,7 @@ Toutes les valeurs ci-dessous sont des variables CSS sur `:root`. Le code n'util
 | `--points` / `--points-tint` | `#1f6b3f` | `#e1f1e7` | Boutons +1 +2 +3, bandeau « quel joueur » pour un panier |
 | `--faute` / `--faute-tint` | `#9a3d2e` | `#f8e4df` | Bouton F, bandeau « quel joueur » pour une faute |
 | `--temps-mort` / `--temps-mort-tint` | `#4a4f8c` | `#e7e8f6` | Bouton Temps mort |
-| `--attention` / `--attention-tint` | `#9a6b12` | `#fbefd2` | Fautes d'équipe à 7 et 8, 4e faute d'un joueur, avertissements |
+| `--attention` / `--attention-tint` | `#86590e` | `#fbefd2` | Fautes d'équipe à 7 et 8, 4e faute d'un joueur, avertissements |
 | `--danger` | `#b42318` | — | Fautes d'équipe ≥ 9 (texte blanc), bouton danger, erreurs |
 
 **Forme et mouvement**
@@ -96,7 +96,7 @@ Toutes les valeurs ci-dessous sont des variables CSS sur `:root`. Le code n'util
 - **Bouton** `.btn` : fond `--surface`, bordure `--bordure`, rayon `--r-btn`, hauteur min 48 px, graisse 700, légère ombre. Variantes : `.btn-principal` (fond `--accent`, texte blanc), `.btn-discret` (sans fond ni bordure, texte `--texte-2`), `.btn-danger` (fond `--danger`, texte blanc). Un bouton peut contenir une icône à gauche.
 - **Carte** `.carte` : fond `--surface`, bordure, rayon `--r-carte`, ombre, rembourrage 16 à 22 px. Utilisée par le bandeau, les blocs d'équipe, la carte « match en cours », l'éditeur d'équipe, les dialogues.
 - **Pastille** `.pastille` : libellé en capitales au-dessus d'une valeur en 22 px, fond `--surface-2`, rayon 12 px.
-- **Voyant de fautes** `.fautes-bloc` : même forme que la pastille, largeur min 96 px, valeur 26 px. États : `.niveau-attention` (teinte ambre, bordure ambre), `.niveau-limite` (ambre plein, texte foncé), `.niveau-penalite` (fond `--danger`, texte blanc, halo rouge à 18 %, mention « 2 LF » après la valeur).
+- **Voyant de fautes** `.fautes-bloc` : même forme que la pastille, largeur min 96 px, valeur 26 px. États : `.niveau-attention` (teinte ambre, bordure ambre), `.niveau-limite` (ambre plein, texte blanc), `.niveau-penalite` (fond `--danger`, texte blanc, halo rouge à 18 %, mention « 2 LF » après la valeur).
 - **Icône** : composants SVG inline 20 × 20, `aria-hidden="true"`, trait 2 px, `currentColor`. Jeu minimal : plus, personnes, QR, télécharger, flèche droite, retour (annuler), liste (journal), maison, chrono (temps mort), croix (fermer).
 - **Dialogue** : voile `rgb(29 28 26 / 0.45)`, carte 480 px max, apparition fondu + zoom de 0,96 à 1.
 - **Listes** (journal, licenciés, clubs, sélection) : lignes en cartes basses (rayon 12 px, bordure), sans ombre, espacement 6 px.
