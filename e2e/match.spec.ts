@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
 
 async function remplirEquipe(page: Page, legende: string, nom: string, joueurs: [string, string, 'M' | 'Mme'][]) {
@@ -24,6 +25,8 @@ async function marquer(page: Page, equipe: string, bouton: string, numero: numbe
 }
 
 test('un match se saisit, se corrige, survit à un rechargement et se termine', async ({ page }) => {
+  // Chromium peut annoncer le partage de fichiers : on force le téléchargement, seul geste observable ici.
+  await page.addInitScript(() => Object.defineProperty(navigator, 'canShare', { value: undefined }))
   await page.goto('./')
   await page.getByRole('button', { name: 'Nouveau match' }).click()
   await remplirEquipe(page, 'Équipe A', 'ST DELPHIN', [
@@ -74,6 +77,23 @@ test('un match se saisit, se corrige, survit à un rechargement et se termine', 
   await page.getByRole('button', { name: 'Terminer le match' }).click()
   await expect(page.getByRole('heading', { name: 'Match terminé' })).toBeVisible()
   await expect(page.getByLabel('Score final')).toContainText('3 – 2')
+
+  await page.getByText('Officiels et capitaines').click()
+  await page.getByLabel('Arbitre', { exact: true }).fill('Camille R.')
+  await page.getByLabel('Arbitre', { exact: true }).blur()
+
+  const telechargement = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Enregistrer le PDF' }).click()
+  const fichier = await telechargement
+  expect(fichier.suggestedFilename()).toMatch(/^\d{4}-\d{2}-\d{2}_ST-DELPHIN-GRADIGNAN\.pdf$/)
+  const chemin = await fichier.path()
+  expect(chemin).toBeTruthy()
+  expect(readFileSync(String(chemin)).subarray(0, 4).toString()).toBe('%PDF')
+
+  await expect(page.getByRole('link', { name: "Préparer l'e-mail" })).toHaveAttribute(
+    'href',
+    /^mailto:cd\.33@ufolep\.org\?subject=/,
+  )
 })
 
 test('fonctionne hors ligne après le premier chargement', async ({ page, context }, testInfo) => {

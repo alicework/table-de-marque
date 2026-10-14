@@ -15,6 +15,7 @@ C'est une **PWA** (application web installable) qui fonctionne sur téléphone, 
 - **Alertes réglementaires** : joueur à 4 puis 5 fautes, 7 puis 8 fautes d'équipe par période (2 lancers francs au-delà).
 - **Comptes à rebours** : temps mort (1 min), mi-temps (10 min), avant prolongation (2 min), avec bip et vibration.
 - **Journal et corrections** : annulation de la dernière action, modification ou suppression de n'importe quelle action, changement de numéro ou ajout d'un joueur en cours de match, réouverture d'un match terminé.
+- **Feuille de match PDF** : en fin de match, saisie facultative des officiels, feuille d'une page générée sur l'appareil (partage natif ou téléchargement) et e-mail pré-rempli vers le comité (`cd.33@ufolep.org`) et le coach adverse.
 - **Partage d'équipe par QR code** : chaque coach prépare son équipe sur son téléphone et la transmet à la table de marque par QR code, lien ou code à coller.
 - **Reprise automatique** du match en cours après fermeture de l'application.
 - **Mises à jour maîtrisées** : un bandeau propose la nouvelle version, jamais pendant un match.
@@ -29,6 +30,7 @@ Les seuils du règlement (saison 2025-2026) sont centralisés dans [src/domain/c
 | Build et PWA | Vite, vite-plugin-pwa (Workbox) |
 | Stockage local | Dexie (IndexedDB) |
 | QR code | qrcode (génération), @zxing (lecture caméra) |
+| Feuille de match PDF | pdf-lib, @pdf-lib/fontkit (police Manrope embarquée) |
 | Tests unitaires | Vitest, Testing Library, fake-indexeddb |
 | Tests de bout en bout | Playwright (téléphone, tablette, ordinateur) |
 | Lint | oxlint |
@@ -73,6 +75,7 @@ src/
   storage/       Persistance locale (Dexie) : clubs, licenciés, matchs
   webaffiligue/  Lecture de l'export CSV LiguAsso
   roster-share/  Encodage et décodage d'une équipe partagée (lien, code, QR)
+  pdf/           Feuille de match : modèle, dessin pdf-lib, e-mail (logique pure, sans React)
   ui/            Écrans React : accueil, clubs, préparation, saisie, journal, partage, import
   test/          Fixtures et configuration des tests
 e2e/             Scénarios Playwright

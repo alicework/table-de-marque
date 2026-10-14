@@ -234,6 +234,8 @@ Téléphone en portrait : même logique, les deux blocs d'équipe empilés sur l
 
 ## 8. PDF de la feuille officielle
 
+> **Remplacée** par `docs/superpowers/specs/2026-10-14-feuille-pdf-envoi-design.md` (2026-10-14) : la feuille est générée aux couleurs de l'application, sur une page, sans remplir le PDF officiel ; l'e-mail est pré-rempli par `mailto:` et le PDF joint à la main.
+
 ### Principe
 
 Le PDF vierge officiel (`feuille_match_basketball.pdf`, saison 2025-2026) est embarqué dans l'app. pdf-lib écrit par-dessus aux coordonnées définies dans **un fichier de gabarit unique**. Un changement de modèle se traite en remplaçant le PDF et en ajustant ce gabarit.

@@ -221,9 +221,22 @@ Touchez **Fin de période** :
 
 Passer à la 2ème mi-temps ouvre le compte à rebours de la mi-temps (10 min), jouer une prolongation celui de 2 min.
 
-L'écran **Match terminé** affiche le score final.
+L'écran **Match terminé** affiche le score final et permet d'envoyer la feuille de match.
 
-- **Rouvrir pour corriger** permet de revenir sur une erreur constatée après coup.
+### Officiels et capitaines
+
+Dépliez **Officiels et capitaines** pour saisir le chronométreur, l'opérateur 30", le marqueur, l'arbitre, l'aide arbitre et les deux capitaines. Tout est facultatif : une case non remplie reste vide sur la feuille, à compléter au stylo si besoin. Chaque nom est enregistré dès que vous passez au champ suivant.
+
+### Envoyer la feuille de match
+
+1. Renseignez si vous le souhaitez l'**e-mail du coach adverse** : il recevra la feuille en copie. Cette adresse n'est pas mémorisée.
+2. Touchez **Enregistrer le PDF**. Sur téléphone ou tablette, le menu de partage s'ouvre : choisissez **Enregistrer dans Fichiers** (ou directement **Mail**, la feuille est alors déjà jointe). Sur ordinateur, le fichier se télécharge. Il s'appelle par exemple `2026-10-16_ST-DELPHIN-GRADIGNAN.pdf`.
+3. Touchez **Préparer l'e-mail** : votre messagerie s'ouvre avec le destinataire (`cd.33@ufolep.org`), le coach adverse en copie, l'objet et le texte déjà écrits.
+4. **Joignez le fichier PDF** à l'e-mail, puis envoyez.
+
+La feuille tient sur une page : score, points par période, fautes d'équipe et temps morts, joueurs de chaque équipe avec leurs points et fautes, officiels, date et lieu.
+
+- **Rouvrir pour corriger** permet de revenir sur une erreur constatée après coup ; regénérez ensuite la feuille.
 - **Accueil** revient à l'écran principal.
 
 ---
@@ -264,6 +277,7 @@ Refaites simplement un import (section 2.2) avec un export LiguAsso récent :
 ## 9. Bon à savoir
 
 - **Données sur l'appareil** — Clubs, licenciés et matchs sont enregistrés uniquement sur l'appareil utilisé. Rien n'est envoyé sur internet. Effacer les données du navigateur ou désinstaller l'application supprime tout : utilisez de préférence toujours la même tablette pour la table de marque.
+- **Feuille de match** — Le PDF est fabriqué sur l'appareil, sans connexion. Rien n'est envoyé tant que vous n'envoyez pas vous-même l'e-mail.
 - **Reprise automatique** — Si l'application est fermée pendant un match, elle rouvre directement le match en cours. L'accueil affiche aussi une carte **Match en cours** avec le bouton **Reprendre le match en cours**.
 - **Un seul match en cours** — Créer un nouveau match alors qu'un autre n'est pas terminé est possible (confirmation demandée), mais l'ancien ne sera plus repris automatiquement.
 - **Supprimer un club** supprime aussi ses licenciés ; les matchs déjà joués ne sont pas modifiés.
