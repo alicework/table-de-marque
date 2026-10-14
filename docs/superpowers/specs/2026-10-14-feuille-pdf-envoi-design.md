@@ -143,16 +143,16 @@ Règles de composition :
 `dessinerFeuille(modele, polices)` avec `polices = { normale: Uint8Array; grasse: Uint8Array }`, renvoie `Promise<Uint8Array>`.
 
 - A4 portrait (595,28 × 841,89 pt), marges 36 pt, police Manrope (Regular et Bold, embarquées en **sous-ensemble**), couleurs de `couleurs.ts`.
-- Une seule page. Si le contenu déborde (14 joueurs par équipe et plusieurs prolongations), les hauteurs de lignes des tableaux se réduisent jusqu'à un minimum de 11 pt ; au-delà, une seconde page reçoit le bloc de l'équipe B et les officiels. La seconde page n'est attendue qu'en cas extrême et le test ne l'exige pas.
+- Une seule page. Si le contenu déborde (14 joueurs par équipe et plusieurs prolongations), les hauteurs de lignes des tableaux se réduisent jusqu'à un minimum de 10 pt ; au-delà, une seconde page reçoit le bloc de l'équipe B et les officiels. La seconde page n'est attendue qu'en cas extrême et le test ne l'exige pas.
 - Un utilitaire interne de tableau (colonnes à largeur fixe, en-tête sur fond `surface-2`, lignes alternées `surface` / `fond`, texte aligné à gauche pour les noms et à droite pour les nombres) sert aux trois tableaux.
 - Mise en page de haut en bas :
   1. **En-tête** : `titre` en Bold 22 pt, `sousTitre` en Regular 10 pt `texte-2` ; à droite, `date` et `lieu`.
   2. **Score** : bandeau sur fond `accent-tint` ; `nomA` en `equipe-a`, `nomB` en `equipe-b`, scores en Bold 32 pt, `mention` en 10 pt dessous.
-  3. **Tableau des périodes** : une colonne « Équipe », puis une colonne par entrée de `colonnes`. Dans chaque cellule de période : points en Bold, dessous « F x · TM y » en 8 pt `texte-2`. La colonne « Total » n'a que les points.
+  3. **Tableau des périodes** : colonnes « Équipe », « », puis une colonne par entrée de `colonnes`. Trois lignes par équipe : « Points » (avec le total), « Fautes d'équipe » et « Temps morts » (sans total). Le nom de l'équipe n'est écrit que sur la ligne « Points ».
   4. **Bloc équipe A puis B** : barre de couleur d'équipe à gauche, titre `nom` + « Maillot : couleur », ligne « Coach : … (x faute(s)) » ou « Coach : — ». Tableau des joueurs : N°, Nom, Licence, LF, 2 pts, 3 pts, Points, Fautes. La colonne Fautes dessine 5 cases de 7 pt ; les cases atteintes sont remplies en `faute`, la 5ᵉ en `danger` quand `exclu`.
   5. **Officiels** : grille de 7 cases (2 colonnes), libellé en 8 pt `texte-2`, valeur en 10 pt ou case vide d'une hauteur de 22 pt (signable au stylo).
   6. **Pied de page** sur chaque page : `piedDePage` à gauche, « Page n/N » à droite, 8 pt `texte-2`.
-- Toute chaîne est passée telle quelle à pdf-lib : Manrope couvre le latin étendu. Un caractère hors police lèverait une erreur de pdf-lib, remontée à l'interface (section 6.4).
+- Manrope couvre le latin étendu. Un caractère absent de la police (emoji dans un nom d'équipe, par exemple) est remplacé par « ? » avant le dessin : un nom fantaisiste ne doit jamais empêcher d'envoyer la feuille. Les textes trop longs pour leur colonne sont coupés avec « … ».
 
 ### 5.4 Courriel et nom de fichier
 
@@ -171,7 +171,7 @@ export interface CourrielFeuille {
 export function courrielFeuille(match: Match, etat: EtatMatch, coachAdverse: string | null): CourrielFeuille
 ```
 
-- Slug : décomposition Unicode NFD, suppression des diacritiques, tout caractère hors `[A-Za-z0-9]` remplacé par `-`, tirets consécutifs fusionnés, tirets de bord retirés, vide → « equipe ».
+- Slug : décomposition Unicode NFD, suppression des diacritiques, tout caractère hors `[A-Za-z0-9]` remplacé par `-`, tirets consécutifs fusionnés, tirets de bord retirés. Dans le nom de fichier, un slug vide devient « equipe » et une date absente ou mal formée devient « sans-date ».
 - Objet : « Feuille de match UFOLEP 33 — 16/10/2026 — ST DELPHIN 54–48 GRADIGNAN ».
 - Corps :
 
