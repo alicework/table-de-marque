@@ -23,7 +23,7 @@ export function EcranClubs({ onRetour }: { onRetour: () => void }) {
         </button>
       </header>
       {clubs?.length === 0 && (
-        <p className="sous-titre">Aucun club pour l'instant. Importez un export Webaffiligue ou créez un club.</p>
+        <p className="sous-titre">Aucun club pour l'instant. Importez un export LigueAsso ou créez un club.</p>
       )}
       <ul className="liste-clubs">
         {clubs?.map(({ club, effectif }) => (

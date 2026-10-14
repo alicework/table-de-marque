@@ -19,11 +19,11 @@ async function afficher() {
   return user
 }
 
-describe('Import Webaffiligue', () => {
+describe('Import LigueAsso', () => {
   it("prévisualise puis importe l'export, et le club apparaît", async () => {
     const user = await afficher()
-    await user.upload(screen.getByLabelText('Importer un export Webaffiligue'), fichier(EXPORT))
-    const apercu = within(await screen.findByRole('dialog', { name: 'Import Webaffiligue' }))
+    await user.upload(screen.getByLabelText('Importer un export LigueAsso'), fichier(EXPORT))
+    const apercu = within(await screen.findByRole('dialog', { name: 'Import LigueAsso' }))
     expect(apercu.getByText('SAINT DELPHIN BASKET (nouveau club) : 22 nouveaux, 0 mis à jour, 0 inchangé')).toBeInTheDocument()
     await user.click(apercu.getByRole('button', { name: 'Importer' }))
     const fin = within(await screen.findByRole('dialog', { name: 'Import terminé' }))
@@ -33,25 +33,25 @@ describe('Import Webaffiligue', () => {
 
   it('un réimport ne crée aucun doublon', async () => {
     const user = await afficher()
-    await user.upload(screen.getByLabelText('Importer un export Webaffiligue'), fichier(EXPORT))
-    await user.click(within(await screen.findByRole('dialog', { name: 'Import Webaffiligue' })).getByRole('button', { name: 'Importer' }))
+    await user.upload(screen.getByLabelText('Importer un export LigueAsso'), fichier(EXPORT))
+    await user.click(within(await screen.findByRole('dialog', { name: 'Import LigueAsso' })).getByRole('button', { name: 'Importer' }))
     await user.click(within(await screen.findByRole('dialog', { name: 'Import terminé' })).getByRole('button', { name: 'OK' }))
 
-    await user.upload(screen.getByLabelText('Importer un export Webaffiligue'), fichier(EXPORT))
-    const apercu = within(await screen.findByRole('dialog', { name: 'Import Webaffiligue' }))
+    await user.upload(screen.getByLabelText('Importer un export LigueAsso'), fichier(EXPORT))
+    const apercu = within(await screen.findByRole('dialog', { name: 'Import LigueAsso' }))
     expect(apercu.getByText('SAINT DELPHIN BASKET : 0 nouveau, 0 mis à jour, 22 inchangés')).toBeInTheDocument()
   })
 
   it('annuler ne crée rien', async () => {
     const user = await afficher()
-    await user.upload(screen.getByLabelText('Importer un export Webaffiligue'), fichier(EXPORT))
-    await user.click(within(await screen.findByRole('dialog', { name: 'Import Webaffiligue' })).getByRole('button', { name: 'Annuler' }))
+    await user.upload(screen.getByLabelText('Importer un export LigueAsso'), fichier(EXPORT))
+    await user.click(within(await screen.findByRole('dialog', { name: 'Import LigueAsso' })).getByRole('button', { name: 'Annuler' }))
     expect(screen.getByText(/Aucun club pour l'instant/)).toBeInTheDocument()
   })
 
   it('explique pourquoi un fichier est refusé', async () => {
     const user = await afficher()
-    await user.upload(screen.getByLabelText('Importer un export Webaffiligue'), fichier('Nom;Prénom\nMartin;Hugo\n'))
+    await user.upload(screen.getByLabelText('Importer un export LigueAsso'), fichier('Nom;Prénom\nMartin;Hugo\n'))
     const dialogue = within(await screen.findByRole('dialog', { name: 'Import impossible' }))
     expect(dialogue.getByRole('alert')).toHaveTextContent('colonnes absentes')
     await user.click(dialogue.getByRole('button', { name: 'OK' }))
@@ -66,8 +66,8 @@ describe('Import Webaffiligue', () => {
       '033550002;MEME NOM;Loisirs;033_1;M;Martin;Hugo',
       '033550003;MEME NOM;Loisirs;033_2;Mme;Durand;Léa',
     ].join('\n')
-    await user.upload(screen.getByLabelText('Importer un export Webaffiligue'), fichier(csv))
-    const apercu = within(await screen.findByRole('dialog', { name: 'Import Webaffiligue' }))
+    await user.upload(screen.getByLabelText('Importer un export LigueAsso'), fichier(csv))
+    const apercu = within(await screen.findByRole('dialog', { name: 'Import LigueAsso' }))
     expect(apercu.getAllByText(/MEME NOM \(nouveau club\)/)).toHaveLength(2)
     expect(erreurs).not.toHaveBeenCalled()
     erreurs.mockRestore()
@@ -76,8 +76,8 @@ describe('Import Webaffiligue', () => {
   it('signale les lignes sans licence ignorées', async () => {
     const user = await afficher()
     const texte = `${EXPORT.toString('latin1').trimEnd()}\n"=""Basket ball""";"=""033550002""";"=""SAINT DELPHIN BASKET""";Oui;"=""Loisirs""";"=""""";"=""M""";;;;;;;;;;;;\n`
-    await user.upload(screen.getByLabelText('Importer un export Webaffiligue'), fichier(Buffer.from(texte, 'latin1')))
-    const apercu = within(await screen.findByRole('dialog', { name: 'Import Webaffiligue' }))
+    await user.upload(screen.getByLabelText('Importer un export LigueAsso'), fichier(Buffer.from(texte, 'latin1')))
+    const apercu = within(await screen.findByRole('dialog', { name: 'Import LigueAsso' }))
     expect(apercu.getByText('1 ligne sans n° de licence ignorée.')).toBeInTheDocument()
   })
 })

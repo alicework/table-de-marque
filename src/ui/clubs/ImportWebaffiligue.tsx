@@ -59,7 +59,7 @@ export function ImportWebaffiligue() {
   return (
     <>
       <label className="btn">
-        Importer un export Webaffiligue
+        Importer un export LigueAsso
         <input
           type="file"
           accept=".csv,text/csv,application/vnd.ms-excel,text/comma-separated-values,text/plain"
@@ -72,7 +72,7 @@ export function ImportWebaffiligue() {
       </label>
       {etat.etape === 'apercu' && (
         <Dialogue
-          titre="Import Webaffiligue"
+          titre="Import LigueAsso"
           actions={
             <>
               <button className="btn btn-principal" disabled={enCours} onClick={() => void importer(etat.lecture)}>

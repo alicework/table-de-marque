@@ -7,8 +7,8 @@ import { ApercuEquipe } from './ApercuEquipe'
 import { ScannerQr } from './ScannerQr'
 
 export const MESSAGE_EXPORT_WEBAFFILIGUE =
-  'Ce fichier est un export Webaffiligue (liste des licenciés), pas une équipe partagée. ' +
-  'Importez-le depuis Accueil → Clubs et licenciés → Importer un export Webaffiligue, ' +
+  'Ce fichier est un export LigueAsso (liste des licenciés), pas une équipe partagée. ' +
+  'Importez-le depuis Accueil → Clubs et licenciés → Importer un export LigueAsso, ' +
   'puis choisissez les joueurs dans « Nouveau match ».'
 
 function estExportWebaffiligue(octets: Uint8Array): boolean {

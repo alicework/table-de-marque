@@ -128,7 +128,7 @@ describe('lireExportWebaffiligue', () => {
     const lecture = () => lireExportWebaffiligue(latin1('Nom;Prénom\nMartin;Hugo\n'))
     expect(lecture).toThrow(ErreurExport)
     expect(lecture).toThrow(
-      "Ce fichier n'est pas un export Webaffiligue reconnu : colonnes absentes (N° Adherent, Civilite, N° Association, Nom association).",
+      "Ce fichier n'est pas un export LigueAsso reconnu : colonnes absentes (N° Adherent, Civilite, N° Association, Nom association).",
     )
   })
 

@@ -56,7 +56,7 @@ describe('ImportEquipe', () => {
     expect(await screen.findByRole('dialog', { name: 'Équipe reçue' })).toBeInTheDocument()
   })
 
-  it("explique où importer un export Webaffiligue donné par erreur", async () => {
+  it("explique où importer un export LigueAsso donné par erreur", async () => {
     const { user, onImporter } = afficher()
     const csv = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../../Sortie_simple_Ufolep.csv'))
     await user.upload(
