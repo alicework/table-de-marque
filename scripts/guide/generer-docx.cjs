@@ -2,7 +2,7 @@
  * Génère le guide d'utilisation Word (docs/guide-utilisation.docx) à partir du Markdown,
  * aux couleurs de l'application. Usage : npm run guide [-- source.md sortie.docx]
  *
- * Polices : instances statiques de Manrope (OFL, voir polices/OFL.txt), intégrées au docx.
+ * Polices : instances statiques de Manrope (OFL, voir src/pdf/polices/OFL.txt), intégrées au docx.
  * Logo : celui de l'écran d'accueil (src/ui/Accueil.tsx) rendu en PNG 512 px.
  */
 const fs = require('fs')
@@ -279,7 +279,7 @@ while (i < lignes.length) {
 }
 
 // ---------- Document ----------
-const police = (f) => fs.readFileSync(path.join(__dirname, 'polices', f))
+const police = (f) => fs.readFileSync(path.join(__dirname, '../../src/pdf/polices', f))
 const doc = new Document({
   title: titre,
   creator: 'Table de marque UFOLEP 33',

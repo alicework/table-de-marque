@@ -6,6 +6,10 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   // Chemin de publication : `/` en local, `/table-de-marque/` sur GitHub Pages (fourni par la CI).
   base: process.env.BASE_PATH ?? '/',
+  build: {
+    // pdf-lib (~500 Ko) vit dans son propre morceau, chargé seulement à la génération de la feuille.
+    chunkSizeWarningLimit: 1000,
+  },
   plugins: [
     react(),
     VitePWA({
@@ -31,7 +35,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,ttf}'],
       },
     }),
   ],
