@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { debut, faute, matchDeTest, panier, tempsMort } from '../test/fixtures'
-import { aujourdhui, decrireEvenement, pastillesFautes, pluriel } from './format'
+import { aujourdhui, decrireEvenement, formaterDuree, pastillesFautes, pluriel } from './format'
 
 describe('format', () => {
   it('accorde au pluriel', () => {
@@ -13,6 +13,14 @@ describe('format', () => {
     expect(pastillesFautes(0)).toBe('○○○○○')
     expect(pastillesFautes(2)).toBe('●●○○○')
     expect(pastillesFautes(7)).toBe('●●●●●')
+  })
+
+  it('affiche une durée en minutes et secondes', () => {
+    expect(formaterDuree(600)).toBe('10:00')
+    expect(formaterDuree(60)).toBe('1:00')
+    expect(formaterDuree(59)).toBe('0:59')
+    expect(formaterDuree(7)).toBe('0:07')
+    expect(formaterDuree(0)).toBe('0:00')
   })
 
   it('décrit chaque type d’action', () => {

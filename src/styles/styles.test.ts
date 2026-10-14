@@ -54,6 +54,7 @@ const COUPLES: [texte: string, fond: string, usage: string][] = [
   ['--attention', '--attention-tint', 'voyant à 7 fautes, avertissements'],
   ['--equipe-a', '--equipe-a-tint', 'flèche de possession, équipe A'],
   ['--equipe-b', '--equipe-b-tint', 'flèche de possession, équipe B'],
+  ['--danger', '--surface', 'minuteur à 0:00'],
 ]
 
 describe('styles', () => {

@@ -423,3 +423,18 @@
     min-height: clamp(72px, 14vh, 136px);
   }
 }
+
+/* ---------- Minuteur d'arrêt de jeu ---------- */
+.minuteur {
+  margin: var(--espace-2) 0;
+  text-align: center;
+  font-size: 72px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.minuteur.minuteur-termine {
+  color: var(--danger);
+}

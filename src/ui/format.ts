@@ -37,3 +37,8 @@ export function aujourdhui(date = new Date()): string {
   const deuxChiffres = (n: number) => String(n).padStart(2, '0')
   return `${date.getFullYear()}-${deuxChiffres(date.getMonth() + 1)}-${deuxChiffres(date.getDate())}`
 }
+
+/** 600 → « 10:00 », 7 → « 0:07 ». */
+export function formaterDuree(secondes: number): string {
+  return `${Math.floor(secondes / 60)}:${String(secondes % 60).padStart(2, '0')}`
+}
