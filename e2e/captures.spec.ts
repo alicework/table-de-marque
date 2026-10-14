@@ -66,6 +66,9 @@ test('captures des écrans principaux', async ({ page }, infos) => {
   for (let i = 0; i < 9; i++) await marquer(page, NOM_LONG, 'Faute', [5, 8, 10][i % 3])
   await page.getByRole('group', { name: `Actions ${NOM_LONG}` }).getByRole('button', { name: 'Temps mort' }).click()
   await attendreGarde(page)
+  await capturer('04b-minuteur-temps-mort')
+  await page.getByRole('button', { name: 'Fermer' }).click()
+  await attendreGarde(page)
   await capturer('04-saisie-102-2-penalite')
 
   await page.getByRole('group', { name: 'Actions ST DELPHIN' }).getByRole('button', { name: '+2', exact: true }).click()

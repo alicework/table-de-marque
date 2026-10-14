@@ -5,7 +5,7 @@ import { definirPossession } from '../../domain/commandes'
 import type { NouvelEvenement } from '../../domain/types'
 import { db } from '../../storage/db'
 import { enregistrerMatch, lireMatch } from '../../storage/matchs'
-import { faute, matchDeTest, panier } from '../../test/fixtures'
+import { debut, faute, matchDeTest, panier } from '../../test/fixtures'
 import { GARDE_DOUBLE_TAP } from '../commun/gardeDoubleTap'
 import { EcranMatch } from './EcranMatch'
 
@@ -178,6 +178,53 @@ describe('EcranMatch — flèche de possession', () => {
   })
 })
 
+describe('EcranMatch — minuteurs', () => {
+  const minuteur = (titre: string) => within(screen.getByRole('dialog', { name: titre }))
+
+  it('ouvre 1 min de temps mort et se ferme sur « Fermer »', async () => {
+    const { user } = await afficher()
+    await user.click(actions('ST DELPHIN').getByRole('button', { name: 'Temps mort' }))
+    expect(minuteur('Temps mort — ST DELPHIN').getByRole('timer')).toHaveTextContent('1:00')
+    await user.click(screen.getByRole('button', { name: 'Fermer' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    await waitFor(() => expect(screen.getByLabelText('Temps morts ST DELPHIN')).toHaveTextContent('TM 1'))
+  })
+
+  it('ouvre 10 min de mi-temps au passage à la 2ème mi-temps', async () => {
+    const { user } = await afficher(panier('A', 'a7', 2))
+    await user.click(screen.getByRole('button', { name: 'Fin de période' }))
+    await user.click(screen.getByRole('button', { name: 'Passer à la 2ème mi-temps' }))
+    expect(minuteur('Mi-temps').getByRole('timer')).toHaveTextContent('10:00')
+    expect(await screen.findByText('2ème mi-temps')).toBeInTheDocument()
+  })
+
+  it('ouvre 2 min avant une prolongation', async () => {
+    const { user } = await afficher(debut('MT2'), panier('A', 'a7', 2), panier('B', 'b8', 2))
+    await user.click(screen.getByRole('button', { name: 'Fin de période' }))
+    await user.click(screen.getByRole('button', { name: 'Jouer une prolongation' }))
+    expect(minuteur('Avant la prolongation').getByRole('timer')).toHaveTextContent('2:00')
+  })
+
+  it('n’ouvre rien en fin de match', async () => {
+    const { user } = await afficher(debut('MT2'), panier('A', 'a7', 3))
+    await user.click(screen.getByRole('button', { name: 'Fin de période' }))
+    await user.click(screen.getByRole('button', { name: 'Terminer le match' }))
+    expect(await screen.findByRole('heading', { name: 'Match terminé' })).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('« Annuler » après la popup retire le temps mort sans la rouvrir', async () => {
+    const { user, id } = await afficher()
+    await user.click(actions('GRADIGNAN').getByRole('button', { name: 'Temps mort' }))
+    await user.click(screen.getByRole('button', { name: 'Fermer' }))
+    await waitFor(() => expect(screen.getByLabelText('Temps morts GRADIGNAN')).toHaveTextContent('TM 1'))
+    await user.click(screen.getByRole('button', { name: 'Annuler la dernière action' }))
+    await waitFor(() => expect(screen.getByLabelText('Temps morts GRADIGNAN')).toHaveTextContent('TM 0'))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect((await lireMatch(id))?.evenements).toHaveLength(0)
+  })
+})
+
 describe('garde anti-double-tap', () => {
   // Horloge figée : seul un avancement explicite rouvre la garde.
   let horloge = 1000
@@ -222,6 +269,19 @@ describe('garde anti-double-tap', () => {
     await synchroniser(user)
     expect(screen.getByLabelText('Temps morts ST DELPHIN')).toHaveTextContent('TM 1')
     expect((await lireMatch(id))?.evenements).toHaveLength(2)
+  })
+
+  it('un tap sur « Fermer » pendant la garde est ignoré', async () => {
+    const { user } = await afficher()
+    await user.click(actions('ST DELPHIN').getByRole('button', { name: 'Temps mort' }))
+    const fermer = within(screen.getByRole('dialog', { name: 'Temps mort — ST DELPHIN' })).getByRole('button', {
+      name: 'Fermer',
+    })
+    await user.click(fermer)
+    expect(screen.getByRole('dialog', { name: 'Temps mort — ST DELPHIN' })).toBeInTheDocument()
+    avancer(301)
+    await user.click(fermer)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
   it('le second tap d’un double tap sur « +2 » ne choisit pas la tuile apparue sous le doigt', async () => {
