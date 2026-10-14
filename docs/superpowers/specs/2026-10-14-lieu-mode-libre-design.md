@@ -192,7 +192,7 @@ Fonctions de `src/domain/periodes.ts`, qui reçoivent toutes le format :
 
 ## 7. Hors périmètre
 
-- Chronomètre, compte à rebours ou rappel de fin de période.
+- Chronomètre de jeu, compte à rebours ou rappel de fin de période. Les minuteurs d'arrêt de jeu (temps mort, pauses entre périodes) sont décrits dans `2026-10-14-minuteurs-pauses-design.md`, dont la section 7 complète cette spec (pause entre quarts-temps, mi-temps de 10 ou 5 min en mode libre).
 - Durée des prolongations.
 - Modifier le mode ou le format d'un match déjà créé.
 - Liste de lieux modifiable dans l'app ou mise à jour automatique depuis le site de l'UFOLEP.
