@@ -15,3 +15,6 @@ export const PAUSES = {
   miTemps: 600,
   avantProlongation: 120,
 } as const
+
+/** Adresse à laquelle la feuille de match est retournée, imprimée sur la feuille officielle. */
+export const ADRESSE_COMITE = 'cd.33@ufolep.org'

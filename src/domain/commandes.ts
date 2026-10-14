@@ -1,7 +1,7 @@
 import { calculerEtat } from './etat'
-import { nouvelId } from './match'
+import { nouvelId, OFFICIELS_VIDES } from './match'
 import { choixFinPeriode, periodeSuivante, type ChoixFinPeriode } from './periodes'
-import type { EquipeId, Evenement, Match, NouvelEvenement } from './types'
+import type { EquipeId, Evenement, Match, NouvelEvenement, Officiels } from './types'
 
 export function ajouterEvenement(match: Match, evenement: NouvelEvenement): Match {
   return { ...match, evenements: [...match.evenements, { ...evenement, id: nouvelId() } as Evenement] }
@@ -35,4 +35,13 @@ export function rouvrirMatch(match: Match): Match {
 export function definirPossession(match: Match, equipe: EquipeId): Match {
   if (match.possession === equipe) return match
   return { ...match, possession: equipe }
+}
+
+/** Les officiels ne sont pas des événements : le journal, « Annuler » et les corrections les ignorent. */
+export function definirOfficiels(match: Match, officiels: Officiels): Match {
+  const cles = Object.keys(OFFICIELS_VIDES) as (keyof Officiels)[]
+  const rognes: Officiels = { ...OFFICIELS_VIDES }
+  for (const cle of cles) rognes[cle] = officiels[cle].trim()
+  if (cles.every((cle) => rognes[cle] === match.officiels[cle])) return match
+  return { ...match, officiels: rognes }
 }

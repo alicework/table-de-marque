@@ -3,12 +3,14 @@ import { debut, faute, matchDeTest, panier } from '../test/fixtures'
 import {
   annulerDernier,
   appliquerFinPeriode,
+  definirOfficiels,
   definirPossession,
   remplacerEvenement,
   rouvrirMatch,
   supprimerEvenement,
 } from './commandes'
 import { calculerEtat, fautesEquipeEnCours } from './etat'
+import { OFFICIELS_VIDES } from './match'
 import type { Match } from './types'
 
 describe('opérations sur le journal', () => {
@@ -98,5 +100,20 @@ describe('flèche de possession', () => {
     delete ancien.possession
     expect(ancien.possession).toBeUndefined()
     expect(definirPossession(ancien, 'B').possession).toBe('B')
+  })
+})
+
+describe('definirOfficiels', () => {
+  it('enregistre les officiels rognés sans toucher aux événements', () => {
+    const match = matchDeTest(panier('A', 'a7', 2))
+    const suivant = definirOfficiels(match, { ...OFFICIELS_VIDES, arbitre: '  Camille R. ', capitaineA: 'Dominique' })
+    expect(suivant.officiels).toEqual({ ...OFFICIELS_VIDES, arbitre: 'Camille R.', capitaineA: 'Dominique' })
+    expect(suivant.evenements).toBe(match.evenements)
+    expect(match.officiels).toEqual(OFFICIELS_VIDES)
+  })
+
+  it('renvoie le même objet si rien ne change', () => {
+    const match = definirOfficiels(matchDeTest(), { ...OFFICIELS_VIDES, arbitre: 'Camille R.' })
+    expect(definirOfficiels(match, { ...OFFICIELS_VIDES, arbitre: ' Camille R.' })).toBe(match)
   })
 })
