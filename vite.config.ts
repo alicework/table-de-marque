@@ -4,6 +4,8 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
+  // Chemin de publication : `/` en local, `/table-de-marque/` sur GitHub Pages (fourni par la CI).
+  base: process.env.BASE_PATH ?? '/',
   plugins: [
     react(),
     VitePWA({

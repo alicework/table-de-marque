@@ -37,7 +37,7 @@ test('captures des écrans principaux', async ({ page }, infos) => {
   const capturer = (nom: string) =>
     page.screenshot({ path: `${dossier}/${nom}.png`, fullPage: true, animations: 'disabled' })
 
-  await page.goto('/')
+  await page.goto('./')
   await capturer('01-accueil-vide')
 
   await page.getByRole('button', { name: 'Nouveau match' }).click()
@@ -101,7 +101,7 @@ test('captures des clubs, de la fiche et des dialogues', async ({ page }, infos)
   const capturer = (nom: string) =>
     page.screenshot({ path: `${dossier}/${nom}.png`, fullPage: true, animations: 'disabled' })
 
-  await page.goto('/')
+  await page.goto('./')
   await page.getByRole('button', { name: 'Clubs et licenciés' }).click()
   await page.getByLabel('Importer un export Webaffiligue').setInputFiles('Sortie_simple_Ufolep.csv')
   await expect(page.getByRole('dialog', { name: 'Import Webaffiligue' })).toBeVisible()

@@ -24,7 +24,7 @@ async function marquer(page: Page, equipe: string, bouton: string, numero: numbe
 }
 
 test('un match se saisit, se corrige, survit à un rechargement et se termine', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('./')
   await page.getByRole('button', { name: 'Nouveau match' }).click()
   await remplirEquipe(page, 'Équipe A', 'ST DELPHIN', [
     ['4', 'Martin', 'Mme'],
@@ -78,10 +78,10 @@ test('un match se saisit, se corrige, survit à un rechargement et se termine', 
 
 test('fonctionne hors ligne après le premier chargement', async ({ page, context }, testInfo) => {
   test.skip(testInfo.project.name !== 'ordinateur', 'un seul format suffit pour le service worker')
-  await page.goto('/')
-  await page.evaluate(async () => {
-    await navigator.serviceWorker.ready
-  })
+  await page.goto('./')
+  const portee = await page.evaluate(async () => (await navigator.serviceWorker.ready).scope)
+  // Limité au chemin de l'app : sur GitHub Pages, « / » engloberait les autres sites du compte.
+  expect(portee).toBe(new URL('./', page.url()).href)
   await context.setOffline(true)
   await page.reload()
   await expect(page.getByRole('button', { name: 'Nouveau match' })).toBeVisible()

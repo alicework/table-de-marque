@@ -26,7 +26,7 @@ const CODE_GRADIGNAN = encoderEquipe({
 })
 
 test('import Webaffiligue, équipe A depuis le pool, équipe B par code, puis match', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('./')
   await page.getByRole('button', { name: 'Clubs et licenciés' }).click()
   await page.getByLabel('Importer un export Webaffiligue').setInputFiles({
     name: 'export.csv',
@@ -64,7 +64,7 @@ test('import Webaffiligue, équipe A depuis le pool, équipe B par code, puis ma
 })
 
 test("un lien d'équipe ouvre l'écran Équipe reçue et prépare le match", async ({ page }) => {
-  await page.goto(`/#equipe=${CODE_GRADIGNAN}`)
+  await page.goto(`./#equipe=${CODE_GRADIGNAN}`)
   await expect(page.getByRole('heading', { name: 'Équipe reçue' })).toBeVisible()
   await expect(page).toHaveURL(/\/$/)
   await page.getByRole('button', { name: 'Nouveau match : en équipe B' }).click()
