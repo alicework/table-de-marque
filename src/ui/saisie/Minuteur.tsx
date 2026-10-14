@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Dialogue } from '../commun/Dialogue'
 import { emettreSignal } from '../commun/signal'
+import { useEcranAllume } from '../commun/veille'
 import { formaterDuree } from '../format'
 
 /** Rafraîchissement plus fréquent que la seconde : l'affichage ne saute pas de chiffre. */
@@ -22,6 +23,7 @@ export function Minuteur({ titre, fin, onFermer }: Props) {
   const [secondes, setSecondes] = useState(() => restant(fin))
   const signale = useRef(false)
   const termine = secondes === 0
+  useEcranAllume()
 
   useEffect(() => {
     if (termine) {

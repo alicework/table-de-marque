@@ -66,6 +66,41 @@ describe('Minuteur', () => {
     expect(emettreSignal).toHaveBeenCalledTimes(1)
   })
 
+  describe('écran allumé', () => {
+    function fauxVerrou() {
+      const liberer = vi.fn(() => Promise.resolve())
+      const demander = vi.fn(() => Promise.resolve({ release: liberer }))
+      Object.defineProperty(navigator, 'wakeLock', { value: { request: demander }, configurable: true })
+      return { demander, liberer }
+    }
+    const reglerPromesses = () => act(async () => {})
+
+    afterEach(() => {
+      Reflect.deleteProperty(navigator, 'wakeLock')
+    })
+
+    it('empêche la veille tant que la popup est ouverte', async () => {
+      const { demander, liberer } = fauxVerrou()
+      const { unmount } = render(<Minuteur titre="Mi-temps" fin={DEPART + 600_000} onFermer={vi.fn()} />)
+      await reglerPromesses()
+      expect(demander).toHaveBeenCalledWith('screen')
+      expect(liberer).not.toHaveBeenCalled()
+      unmount()
+      expect(liberer).toHaveBeenCalledTimes(1)
+    })
+
+    it('redemande le verrou au retour au premier plan', async () => {
+      const { demander } = fauxVerrou()
+      render(<Minuteur titre="Mi-temps" fin={DEPART + 600_000} onFermer={vi.fn()} />)
+      await reglerPromesses()
+      act(() => {
+        document.dispatchEvent(new Event('visibilitychange'))
+      })
+      await reglerPromesses()
+      expect(demander).toHaveBeenCalledTimes(2)
+    })
+  })
+
   it('se ferme sur « Fermer », même avant la fin', () => {
     const onFermer = vi.fn()
     render(<Minuteur titre="Avant la prolongation" fin={DEPART + 120_000} onFermer={onFermer} />)
