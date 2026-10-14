@@ -30,6 +30,14 @@ describe('EcranClubs', () => {
     expect(await screen.findByRole('button', { name: /ST DELPHIN.*0 licencié/ })).toBeInTheDocument()
   })
 
+  it("propose le lien direct vers l'extraction des adhérents LiguAsso", async () => {
+    await afficher()
+    const lien = screen.getByRole('link', { name: /Ouvrir l'extraction des adhérents/ })
+    expect(lien).toHaveAttribute('href', 'https://www.liguasso.org/LAPOOL5/Pages/Private/Extractions/AdhExtract.aspx')
+    expect(lien).toHaveAttribute('target', '_blank')
+    expect(lien).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
   it('refuse un club sans nom', async () => {
     const user = await afficher()
     await user.click(screen.getByRole('button', { name: 'Nouveau club' }))

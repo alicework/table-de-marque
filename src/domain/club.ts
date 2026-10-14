@@ -3,7 +3,7 @@ import type { Civilite } from './types'
 
 export interface Club {
   id: string
-  /** Identifiant LigueAsso, sert à retrouver le club lors d'un réimport. */
+  /** Identifiant LiguAsso, sert à retrouver le club lors d'un réimport. */
   numeroAssociation: string | null
   nom: string
   couleurParDefaut: string

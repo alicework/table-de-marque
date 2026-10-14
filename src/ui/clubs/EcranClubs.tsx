@@ -1,11 +1,14 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { listerClubsAvecEffectif } from '../../storage/clubs'
-import { IconeChevron } from '../commun/Icones'
+import { IconeChevron, IconeLienExterne } from '../commun/Icones'
 import { pluriel } from '../format'
 import { DialogueClub } from './DialogueClub'
 import { FicheClub } from './FicheClub'
 import { ImportWebaffiligue } from './ImportWebaffiligue'
+
+/** Accès direct : le menu Statistiques et Extractions de LiguAsso ne s'ouvre pas sous Firefox. */
+const EXTRACTION_LIGUASSO = 'https://www.liguasso.org/LAPOOL5/Pages/Private/Extractions/AdhExtract.aspx'
 
 export function EcranClubs({ onRetour }: { onRetour: () => void }) {
   const clubs = useLiveQuery(() => listerClubsAvecEffectif(), [])
@@ -23,7 +26,7 @@ export function EcranClubs({ onRetour }: { onRetour: () => void }) {
         </button>
       </header>
       {clubs?.length === 0 && (
-        <p className="sous-titre">Aucun club pour l'instant. Importez un export LigueAsso ou créez un club.</p>
+        <p className="sous-titre">Aucun club pour l'instant. Importez un export LiguAsso ou créez un club.</p>
       )}
       <ul className="liste-clubs">
         {clubs?.map(({ club, effectif }) => (
@@ -41,6 +44,16 @@ export function EcranClubs({ onRetour }: { onRetour: () => void }) {
           Nouveau club
         </button>
         <ImportWebaffiligue />
+      </div>
+      <div className="note-lien">
+        <p className="sous-titre">
+          L'export se récupère sur LiguAsso : Statistiques et Extractions → Extractions → Extraction adhérents, au
+          format CSV.
+        </p>
+        <a className="btn" href={EXTRACTION_LIGUASSO} target="_blank" rel="noopener noreferrer">
+          <IconeLienExterne />
+          Ouvrir l'extraction des adhérents
+        </a>
       </div>
       {creation && <DialogueClub club={null} onFermer={() => setCreation(false)} />}
     </section>

@@ -25,10 +25,10 @@ const CODE_GRADIGNAN = encoderEquipe({
   coach: null,
 })
 
-test('import LigueAsso, équipe A depuis le pool, équipe B par code, puis match', async ({ page }) => {
+test('import LiguAsso, équipe A depuis le pool, équipe B par code, puis match', async ({ page }) => {
   await page.goto('./')
   await page.getByRole('button', { name: 'Clubs et licenciés' }).click()
-  await page.getByLabel('Importer un export LigueAsso').setInputFiles({
+  await page.getByLabel('Importer un export LiguAsso').setInputFiles({
     name: 'export.csv',
     mimeType: 'text/csv',
     buffer: EXPORT,

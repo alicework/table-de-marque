@@ -50,13 +50,14 @@ Avant le premier match, enregistrez une fois pour toutes votre club et ses licen
 
 Deux possibilités :
 
-- **Recommandé** : importer l'export LigueAsso (tous les licenciés d'un coup) ;
+- **Recommandé** : importer l'export LiguAsso (tous les licenciés d'un coup) ;
 - créer le club et ses licenciés à la main.
 
-### 2.1 Récupérer l'export LigueAsso
+### 2.1 Récupérer l'export LiguAsso
 
-1. Connectez-vous à **LigueAsso** avec le compte de l'association.
+1. Connectez-vous à **LiguAsso** avec le compte de l'association.
 2. Ouvrez le menu **Statistiques et Extractions** → **Extractions** → **Extraction adhérents**.
+   Si le menu ne s'ouvre pas (cas de Firefox), utilisez le lien direct : [Extraction adhérents sur LiguAsso](https://www.liguasso.org/LAPOOL5/Pages/Private/Extractions/AdhExtract.aspx). Il est aussi proposé dans l'application, sur l'écran **Clubs et licenciés** (bouton **Ouvrir l'extraction des adhérents**).
 3. Exportez la liste des adhérents au format **CSV**.
 4. Enregistrez le fichier sur l'appareil qui servira de table de marque (téléchargement, e-mail, cloud…).
 
@@ -75,7 +76,7 @@ Le fichier doit contenir au minimum les colonnes suivantes (c'est le cas de l'ex
 ### 2.2 Importer l'export
 
 1. Sur l'accueil, touchez **Clubs et licenciés**.
-2. Touchez **Importer un export LigueAsso** et choisissez le fichier CSV.
+2. Touchez **Importer un export LiguAsso** et choisissez le fichier CSV.
 3. Un aperçu s'affiche, club par club : par exemple *« Mon Club (nouveau club) : 18 nouveaux, 0 mis à jour, 0 inchangé »*.
    Les lignes sans n° de licence sont ignorées et signalées.
 4. Touchez **Importer**, puis **OK**.
@@ -92,13 +93,13 @@ Touchez le nom du club pour ouvrir sa fiche :
 
 ### 2.4 Variante : créer un club à la main
 
-Sans accès à LigueAsso :
+Sans accès à LiguAsso :
 
 1. **Clubs et licenciés** → **Nouveau club**.
 2. Saisissez le **nom du club** (obligatoire) et la **couleur par défaut**, puis **Enregistrer**.
 3. Ouvrez le club et ajoutez chaque joueur avec **Ajouter un licencié** (licence, nom, prénom, F/H).
 
-> Vous pourrez importer un export LigueAsso plus tard : un club créé à la main n'ayant pas de n° d'association, l'import créera un second club. Supprimez alors le club saisi à la main.
+> Vous pourrez importer un export LiguAsso plus tard : un club créé à la main n'ayant pas de n° d'association, l'import créera un second club. Supprimez alors le club saisi à la main.
 
 ### 2.5 Clubs adverses
 
@@ -251,7 +252,7 @@ Si le lien reçu par message est ouvert directement, l'application propose **Nou
 
 ## 8. Mettre à jour les licenciés en cours de saison
 
-Refaites simplement un import (section 2.2) avec un export LigueAsso récent :
+Refaites simplement un import (section 2.2) avec un export LiguAsso récent :
 
 - le club est retrouvé grâce à son **n° d'association** ;
 - chaque licencié est reconnu par son **n° de licence** ;
@@ -266,7 +267,7 @@ Refaites simplement un import (section 2.2) avec un export LigueAsso récent :
 - **Reprise automatique** — Si l'application est fermée pendant un match, elle rouvre directement le match en cours. L'accueil affiche aussi une carte **Match en cours** avec le bouton **Reprendre le match en cours**.
 - **Un seul match en cours** — Créer un nouveau match alors qu'un autre n'est pas terminé est possible (confirmation demandée), mais l'ancien ne sera plus repris automatiquement.
 - **Supprimer un club** supprime aussi ses licenciés ; les matchs déjà joués ne sont pas modifiés.
-- **Mauvais fichier** — Si l'export LigueAsso est donné par erreur à **Importer une équipe**, l'application le signale et indique où l'importer.
+- **Mauvais fichier** — Si l'export LiguAsso est donné par erreur à **Importer une équipe**, l'application le signale et indique où l'importer.
 
 ### Règles appliquées (saison 2025-2026)
 

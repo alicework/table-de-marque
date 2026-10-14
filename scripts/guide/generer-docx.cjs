@@ -42,7 +42,7 @@ const PASTILLES = {
 
 function runs(texte, base = {}) {
   const resultat = []
-  const re = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`|\[(.+?)\]\((#.+?)\)/g
+  const re = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`|\[(.+?)\]\((.+?)\)/g
   let dernier = 0
   let m
   const brut = (t, opts = {}) => new TextRun({ text: t, ...base, ...opts })
@@ -60,9 +60,13 @@ function runs(texte, base = {}) {
     } else if (m[3] !== undefined) {
       resultat.push(brut(` ${m[3]} `, { shading: { type: ShadingType.CLEAR, fill: C.surface2, color: 'auto' } }))
     } else {
-      const cible = signets.get(m[5].slice(1))
       const lien = new TextRun({ text: m[4], ...base, color: C.accentTexte, underline: {} })
-      resultat.push(cible ? new InternalHyperlink({ anchor: cible, children: [lien] }) : lien)
+      if (!m[5].startsWith('#')) {
+        resultat.push(new ExternalHyperlink({ link: m[5], children: [lien] }))
+      } else {
+        const cible = signets.get(m[5].slice(1))
+        resultat.push(cible ? new InternalHyperlink({ anchor: cible, children: [lien] }) : lien)
+      }
     }
     dernier = re.lastIndex
   }

@@ -37,7 +37,7 @@ const LIBELLES: Record<Colonne, string> = {
 
 const OBLIGATOIRES: Colonne[] = ['licence', 'nom', 'prenom', 'civilite', 'numeroAssociation', 'nomAssociation']
 
-/** LigueAsso exporte en ISO-8859-1 (windows-1252 en est un sur-ensemble) ; Excel peut ré-enregistrer en UTF-8. */
+/** LiguAsso exporte en ISO-8859-1 (windows-1252 en est un sur-ensemble) ; Excel peut ré-enregistrer en UTF-8. */
 export function decoderOctets(octets: Uint8Array): string {
   if (octets[0] === 0xef && octets[1] === 0xbb && octets[2] === 0xbf) {
     return new TextDecoder('utf-8').decode(octets.subarray(3))
@@ -89,7 +89,7 @@ export function decouperCsv(texte: string, separateur: string): string[][] {
 }
 
 /**
- * LigueAsso écrit les valeurs comme des formules Excel ="…". Selon l'export, elles sont
+ * LiguAsso écrit les valeurs comme des formules Excel ="…". Selon l'export, elles sont
  * entourées de guillemets CSV ("=""…""" → ="…") ou non (="…" → =… une fois les guillemets lus).
  */
 export function nettoyerValeur(brute: string): string {
@@ -132,7 +132,7 @@ export function lireExportWebaffiligue(octets: Uint8Array): ResultatLecture {
   }
   if (manquantes.length > 0) {
     throw new ErreurExport(
-      `Ce fichier n'est pas un export LigueAsso reconnu : colonnes absentes (${manquantes.join(', ')}).`,
+      `Ce fichier n'est pas un export LiguAsso reconnu : colonnes absentes (${manquantes.join(', ')}).`,
     )
   }
 
