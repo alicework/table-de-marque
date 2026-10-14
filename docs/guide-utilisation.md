@@ -23,37 +23,22 @@ Elle fonctionne sur téléphone et sur tablette, **sans connexion internet** une
 ## 1. Installer l'application
 
 <!--
-  EMPLACEMENT DU QR CODE DE TÉLÉCHARGEMENT
-  Quand l'application sera en ligne :
-  1. générer le QR code pointant vers l'adresse publique ;
-  2. l'enregistrer dans docs/images/qrcode-application.png ;
-  3. remplacer le bloc « QR code à venir » ci-dessous par :
-       <p align="center"><img src="images/qrcode-application.png" alt="QR code de téléchargement de la Table de marque" width="220"></p>
-  4. renseigner l'adresse à la place de « adresse à venir ».
+  Le QR code est généré par « npm run guide » à partir de l'adresse ci-dessous :
+  modifier l'adresse ici puis relancer la commande suffit.
 -->
 
-<table align="center">
-  <tr>
-    <td align="center" width="260">
-      <br>
-      <b>QR code à venir</b>
-      <br><br>
-      <i>Disponible dès la mise en ligne</i>
-      <br><br>
-    </td>
-  </tr>
-</table>
+<p align="center"><img src="images/qrcode-application.png" alt="QR code de la Table de marque" width="220"></p>
 
-<p align="center">Adresse : <b><i>adresse à venir</i></b></p>
+<p align="center">Adresse : <a href="https://alicework.github.io/table-de-marque/">https://alicework.github.io/table-de-marque/</a></p>
 
-Scannez le QR code avec l'appareil photo du téléphone ou de la tablette, puis installez l'application sur l'écran d'accueil :
+Scannez le QR code avec l'appareil photo du téléphone ou de la tablette, ou saisissez l'adresse dans le navigateur. Installez ensuite l'application sur l'écran d'accueil :
 
 | Appareil | Navigateur | Installation |
 | --- | --- | --- |
 | iPhone / iPad | Safari | Bouton **Partager** → **Sur l'écran d'accueil** |
 | Android | Chrome | Menu **⋮** → **Installer l'application** (ou **Ajouter à l'écran d'accueil**) |
 
-Une fois installée, l'application s'ouvre comme une application classique, en plein écran, et **fonctionne hors connexion** : le gymnase n'a pas besoin de réseau.
+La première ouverture demande une connexion internet. Une fois installée, l'application s'ouvre comme une application classique, en plein écran, et **fonctionne hors connexion** : le gymnase n'a pas besoin de réseau.
 
 > **Mises à jour** — Quand une nouvelle version est disponible, un bandeau **« Nouvelle version disponible »** apparaît sur l'écran d'accueil. Touchez **Recharger**. Ce bandeau ne s'affiche jamais pendant un match.
 

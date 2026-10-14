@@ -13,7 +13,7 @@
     "typecheck": "tsc -b",
     "icones": "pwa-assets-generator --preset minimal-2023 public/icone.svg",
     "e2e": "playwright test",
-    "guide": "node scripts/guide/generer-docx.cjs"
+    "guide": "node scripts/guide/generer-qr.cjs && node scripts/guide/generer-docx.cjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",

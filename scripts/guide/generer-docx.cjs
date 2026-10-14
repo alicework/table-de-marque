@@ -8,9 +8,9 @@
 const fs = require('fs')
 const path = require('path')
 const {
-  AlignmentType, BorderStyle, Bookmark, Document, Footer, ImageRun, InternalHyperlink, LevelFormat,
-  Packer, PageBreak, PageNumber, Paragraph, ShadingType, Table, TableCell, TableLayoutType, TableRow,
-  TabStopType, TextRun, VerticalAlign, WidthType, HeightRule,
+  AlignmentType, BorderStyle, Bookmark, Document, ExternalHyperlink, Footer, ImageRun, InternalHyperlink,
+  LevelFormat, Packer, PageBreak, PageNumber, Paragraph, ShadingType, Table, TableCell, TableLayoutType,
+  TableRow, TabStopType, TextRun, VerticalAlign, WidthType,
 } = require('docx')
 
 const racine = path.join(__dirname, '../..')
@@ -144,34 +144,29 @@ function tableau(lignes) {
   })
 }
 
-function blocQr() {
-  const L = 3400
-  const pointille = { style: BorderStyle.DASHED, size: 12, color: C.accent }
-  return [
-    new Table({
-      width: { size: L, type: WidthType.DXA },
-      columnWidths: [L],
-      alignment: AlignmentType.CENTER,
-      layout: TableLayoutType.FIXED,
-      rows: [new TableRow({
-        height: { value: L, rule: HeightRule.EXACT },
-        children: [new TableCell({
-          width: { size: L, type: WidthType.DXA },
-          verticalAlign: VerticalAlign.CENTER,
-          shading: { type: ShadingType.CLEAR, fill: C.surface, color: 'auto' },
-          borders: { top: pointille, bottom: pointille, left: pointille, right: pointille },
-          children: [
-            new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: 'QR code à venir', font: POLICE_TITRE, size: 26, color: C.accentTexte })] }),
-            new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Disponible dès la mise en ligne', italics: true, size: 18, color: C.texte2 })] }),
-          ],
-        })],
-      })],
-    }),
-    new Paragraph({
-      alignment: AlignmentType.CENTER, spacing: { before: 160, after: 240 },
-      children: [new TextRun({ text: 'Adresse : ', color: C.texte2 }), new TextRun({ text: 'adresse à venir', bold: true, italics: true, color: C.texte })],
-    }),
-  ]
+// QR code d'installation (généré par generer-qr.cjs) et adresse de l'application.
+const adresse = /Adresse : <a href="(https?:[^"]+)"/.exec(md)?.[1]
+
+function blocHtml(ligne) {
+  const image = /<img src="([^"]+)"/.exec(ligne)?.[1]
+  if (image) {
+    const qr = fs.readFileSync(path.join(path.dirname(source), image))
+    return new Paragraph({
+      alignment: AlignmentType.CENTER, spacing: { before: 120, after: 0 },
+      children: [new ImageRun({ type: 'png', data: qr, transformation: { width: 170, height: 170 } })],
+    })
+  }
+  const lien = /^<p[^>]*>(.*?)<a href="([^"]+)">(.*?)<\/a><\/p>$/.exec(ligne)
+  if (lien) {
+    return new Paragraph({
+      alignment: AlignmentType.CENTER, spacing: { before: 60, after: 240 },
+      children: [
+        new TextRun({ text: lien[1], color: C.texte2 }),
+        new ExternalHyperlink({ link: lien[2], children: [new TextRun({ text: lien[3], bold: true, color: C.accentTexte, underline: {} })] }),
+      ],
+    })
+  }
+  return null
 }
 
 // ---------- Couverture ----------
@@ -197,6 +192,9 @@ const couverture = [
     new TextRun({ text: 'Saison 2025-2026', bold: true, color: C.accentTexte, size: 20 }),
     new TextRun({ text: '  ·  Téléphone et tablette  ·  Fonctionne hors connexion', color: C.texte2, size: 20 }),
   ] }),
+  ...(adresse ? [new Paragraph({ spacing: { before: 80 }, children: [
+    new ExternalHyperlink({ link: adresse, children: [new TextRun({ text: adresse.replace(/^https:\/\//, ''), color: C.accentTexte, size: 20, underline: {} })] }),
+  ] })] : []),
   new Paragraph({ children: [new PageBreak()] }),
 ]
 
@@ -212,8 +210,7 @@ while (i < lignes.length) {
   if (t === '' || t === '---') { if (t === '') dansListeNumerotee = dansListeNumerotee && /^\s+\S|^\d+\. /.test(lignes[i + 1] ?? ''); i++; continue }
 
   if (t.startsWith('<!--')) { while (!lignes[i].includes('-->')) i++; i++; continue }
-  if (t.startsWith('<table')) { while (!lignes[i].includes('</table>')) i++; i++; corps.push(...blocQr()); continue }
-  if (t.startsWith('<p')) { i++; continue }
+  if (t.startsWith('<p')) { const bloc = blocHtml(t); if (bloc) corps.push(bloc); i++; continue }
 
   if (t.startsWith('## ')) {
     const texte = t.slice(3)
