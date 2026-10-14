@@ -114,7 +114,7 @@ Rien n'oblige à enregistrer les clubs adverses. Le jour du match, l'équipe adv
 
 Sur l'accueil, touchez **Nouveau match**.
 
-1. Vérifiez la **date** (aujourd'hui par défaut) et indiquez le **lieu**.
+1. Vérifiez la **date** (aujourd'hui par défaut) et choisissez le **lieu** dans la liste des salles des clubs UFOLEP 33. Pour une salle absente de la liste, prenez **Autre lieu…** et saisissez-la. Le lieu reste facultatif.
 2. Pour l'**équipe A**, puis l'**équipe B** :
   - **Club** : choisissez votre club dans la liste. Le nom d'équipe et la couleur se remplissent tout seuls (modifiables). Pour une équipe non enregistrée, laissez **Saisie libre**.
   - **Choisir les joueurs du club** : cochez les présents (recherche par nom ou n° de licence), puis **Valider**.

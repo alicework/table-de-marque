@@ -1,7 +1,7 @@
 # Choix du lieu, mode libre et format des périodes
 
 **Date :** 2026-10-14
-**Statut :** conception validée en conversation, implémentation reportée
+**Statut :** conception validée en conversation ; section 4 (lieu) implémentée le 2026-10-14, sections 5 et 6 (mode libre, format des périodes) reportées
 **Spec parente :** `docs/superpowers/specs/2026-10-11-basket-score-sheet-design.md`
 
 ## 1. Objectif

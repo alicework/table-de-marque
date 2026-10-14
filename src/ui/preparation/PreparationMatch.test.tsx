@@ -25,16 +25,63 @@ describe('PreparationMatch', () => {
     const groupeA = within(screen.getByRole('group', { name: 'Équipe A' }))
     await user.selectOptions(groupeA.getByLabelText('Coach'), 'n°7 Durand')
     await remplirEquipe(user, 'Équipe B', 'GRADIGNAN', EQUIPE_B)
-    await user.type(screen.getByLabelText('Lieu'), 'Villenave')
+    await user.selectOptions(screen.getByLabelText('Lieu'), 'St Delphin — Complexe sportif Elisabeth Riffiod, Villenave-d’Ornon')
     await user.click(screen.getByRole('button', { name: 'Commencer le match' }))
 
     await waitFor(() => expect(onDemarre).toHaveBeenCalledTimes(1))
     const match = await lireMatch(onDemarre.mock.calls[0][0])
-    expect(match?.lieu).toBe('Villenave')
+    expect(match?.lieu).toBe('St Delphin — Complexe sportif Elisabeth Riffiod, Villenave-d’Ornon')
     expect(match?.equipes.A.joueurs.map((j) => j.numero)).toEqual([4, 7])
     const durand = match?.equipes.A.joueurs.find((j) => j.nom === 'Durand')
     expect(match?.equipes.A.coach).toEqual({ type: 'joueur', joueurId: durand?.id })
     expect(match?.equipes.B.nom).toBe('GRADIGNAN')
+  })
+
+  it('propose les salles des clubs triées, avec « Autre lieu… » en dernier', () => {
+    render(<PreparationMatch onDemarre={vi.fn()} onRetour={vi.fn()} />)
+
+    const options = within(screen.getByLabelText('Lieu')).getAllByRole('option')
+    expect(options[0]).toHaveTextContent('— Choisir —')
+    expect(options[1]).toHaveTextContent('Amicale des Basketteurs Gradignan — Salle Jehan Buhan, Gradignan')
+    expect(options[options.length - 1]).toHaveTextContent('Autre lieu…')
+    expect(options).toHaveLength(17)
+    expect(screen.queryByLabelText('Précisez le lieu')).not.toBeInTheDocument()
+  })
+
+  it('enregistre le texte saisi pour « Autre lieu… »', async () => {
+    const user = userEvent.setup()
+    const onDemarre = vi.fn()
+    render(<PreparationMatch onDemarre={onDemarre} onRetour={vi.fn()} />)
+
+    await remplirEquipe(user, 'Équipe A', 'ST DELPHIN', [
+      { numero: '4', nom: 'Martin', civilite: 'Mme' },
+      { numero: '7', nom: 'Durand', civilite: 'Mme' },
+    ])
+    await remplirEquipe(user, 'Équipe B', 'GRADIGNAN', EQUIPE_B)
+    await user.selectOptions(screen.getByLabelText('Lieu'), 'Autre lieu…')
+    await user.type(screen.getByLabelText('Précisez le lieu'), '  Gymnase du lycée, Bègles ')
+    await user.click(screen.getByRole('button', { name: 'Commencer le match' }))
+
+    await waitFor(() => expect(onDemarre).toHaveBeenCalledTimes(1))
+    const match = await lireMatch(onDemarre.mock.calls[0][0])
+    expect(match?.lieu).toBe('Gymnase du lycée, Bègles')
+  })
+
+  it('laisse le lieu vide quand rien n’est choisi', async () => {
+    const user = userEvent.setup()
+    const onDemarre = vi.fn()
+    render(<PreparationMatch onDemarre={onDemarre} onRetour={vi.fn()} />)
+
+    await remplirEquipe(user, 'Équipe A', 'ST DELPHIN', [
+      { numero: '4', nom: 'Martin', civilite: 'Mme' },
+      { numero: '7', nom: 'Durand', civilite: 'Mme' },
+    ])
+    await remplirEquipe(user, 'Équipe B', 'GRADIGNAN', EQUIPE_B)
+    await user.click(screen.getByRole('button', { name: 'Commencer le match' }))
+
+    await waitFor(() => expect(onDemarre).toHaveBeenCalledTimes(1))
+    const match = await lireMatch(onDemarre.mock.calls[0][0])
+    expect(match?.lieu).toBe('')
   })
 
   it('bloque le démarrage si un n° est attribué deux fois', async () => {

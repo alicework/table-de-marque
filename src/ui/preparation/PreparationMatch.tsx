@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { verifierEquipe } from '../../domain/equipe'
+import { LIEUX, libelleLieu } from '../../domain/lieux'
 import { nouveauMatch } from '../../domain/match'
 import type { EquipeId } from '../../domain/types'
 import { enregistrerMatch } from '../../storage/matchs'
@@ -14,9 +15,14 @@ interface Props {
   equipesInitiales?: Partial<Record<EquipeId, BrouillonEquipe>>
 }
 
+/** Valeur du sélecteur quand le lieu est saisi à la main ; ne peut pas être confondue avec un libellé de salle. */
+const AUTRE_LIEU = 'autre'
+
 export function PreparationMatch({ onDemarre, onRetour, equipesInitiales }: Props) {
   const [date, setDate] = useState(() => aujourdhui())
-  const [lieu, setLieu] = useState('')
+  const [choixLieu, setChoixLieu] = useState('')
+  const [lieuLibre, setLieuLibre] = useState('')
+  const lieu = choixLieu === AUTRE_LIEU ? lieuLibre : choixLieu
   const [equipeA, setEquipeA] = useState(() => equipesInitiales?.A ?? brouillonVide())
   const [equipeB, setEquipeB] = useState(() => equipesInitiales?.B ?? brouillonVide())
   const [tentative, setTentative] = useState(false)
@@ -58,8 +64,25 @@ export function PreparationMatch({ onDemarre, onRetour, equipesInitiales }: Prop
         </label>
         <label>
           Lieu
-          <input value={lieu} onChange={(e) => setLieu(e.target.value)} />
+          <select value={choixLieu} onChange={(e) => setChoixLieu(e.target.value)}>
+            <option value="">— Choisir —</option>
+            {LIEUX.map((candidat) => {
+              const libelle = libelleLieu(candidat)
+              return (
+                <option key={libelle} value={libelle}>
+                  {libelle}
+                </option>
+              )
+            })}
+            <option value={AUTRE_LIEU}>Autre lieu…</option>
+          </select>
         </label>
+        {choixLieu === AUTRE_LIEU && (
+          <label>
+            Précisez le lieu
+            <input value={lieuLibre} onChange={(e) => setLieuLibre(e.target.value)} />
+          </label>
+        )}
       </div>
       <div className="equipes-preparation">
         <EditeurEquipe titre="Équipe A" valeur={equipeA} onChange={setEquipeA} afficherErreurs={tentative} />
