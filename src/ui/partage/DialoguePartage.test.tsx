@@ -26,12 +26,18 @@ describe('DialoguePartage', () => {
     expect(decoderEquipe(code)).toEqual(EQUIPE)
   })
 
-  it('copie le lien de l’équipe', async () => {
+  it('copie le code de l’équipe', async () => {
     const user = userEvent.setup()
     render(<DialoguePartage equipe={EQUIPE} onFermer={vi.fn()} />)
-    await user.click(screen.getByRole('button', { name: 'Copier le lien' }))
-    expect(await screen.findByRole('status')).toHaveTextContent('Lien copié.')
-    expect(await navigator.clipboard.readText()).toMatch(/#equipe=[A-Za-z0-9_-]+$/)
+    await user.click(screen.getByRole('button', { name: 'Copier le code' }))
+    expect(await screen.findByRole('status')).toHaveTextContent('Code copié.')
+    expect(decoderEquipe(await navigator.clipboard.readText())).toEqual(EQUIPE)
+  })
+
+  it('ne propose plus de partager le lien', () => {
+    render(<DialoguePartage equipe={EQUIPE} onFermer={vi.fn()} />)
+    expect(screen.queryByRole('button', { name: 'Copier le lien' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Partager…' })).not.toBeInTheDocument()
   })
 
   it('propose de copier le code à la main si le presse-papiers est refusé', async () => {

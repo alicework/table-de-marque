@@ -16,7 +16,7 @@ C'est une **PWA** (application web installable) qui fonctionne sur téléphone, 
 - **Comptes à rebours** : temps mort (1 min), mi-temps (10 min), avant prolongation (2 min), avec bip et vibration.
 - **Journal et corrections** : annulation de la dernière action, modification ou suppression de n'importe quelle action, changement de numéro ou ajout d'un joueur en cours de match, réouverture d'un match terminé.
 - **Feuille de match PDF** : en fin de match, saisie facultative des officiels, feuille d'une page générée sur l'appareil (partage natif ou téléchargement) et e-mail pré-rempli vers le comité (`cd.33@ufolep.org`) et le coach adverse.
-- **Partage d'équipe par QR code** : chaque coach prépare son équipe sur son téléphone et la transmet à la table de marque par QR code, lien ou code à coller.
+- **Partage d'équipe par QR code** : chaque coach prépare son équipe sur son téléphone et la transmet à la table de marque par QR code ou code à coller.
 - **Reprise automatique** du match en cours après fermeture de l'application.
 - **Mises à jour maîtrisées** : un bandeau propose la nouvelle version, jamais pendant un match.
 

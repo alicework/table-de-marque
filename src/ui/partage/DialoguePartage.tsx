@@ -23,23 +23,21 @@ export function DialoguePartage({ equipe, onFermer }: Props) {
         if (actif) setSvg(resultat)
       })
       .catch(() => {
-        if (actif) setMessage('QR code impossible à générer : utilisez le lien ou le code.')
+        if (actif) setMessage('QR code impossible à générer : utilisez le code.')
       })
     return () => {
       actif = false
     }
   }, [lien])
 
-  async function copier(texte: string, confirmation: string) {
+  async function copierCode() {
     try {
-      await navigator.clipboard.writeText(texte)
-      setMessage(confirmation)
+      await navigator.clipboard.writeText(code)
+      setMessage('Code copié.')
     } catch {
       setMessage('Copie impossible : sélectionnez le code ci-dessous.')
     }
   }
-
-  const partageNatif = typeof navigator.share === 'function'
 
   return (
     <Dialogue
@@ -59,20 +57,9 @@ export function DialoguePartage({ equipe, onFermer }: Props) {
         <p className="chargement">Préparation du QR code…</p>
       )}
       <div className="actions-equipe">
-        <button className="btn" onClick={() => void copier(lien, 'Lien copié.')}>
-          Copier le lien
-        </button>
-        <button className="btn" onClick={() => void copier(code, 'Code copié.')}>
+        <button className="btn" onClick={() => void copierCode()}>
           Copier le code
         </button>
-        {partageNatif && (
-          <button
-            className="btn"
-            onClick={() => void navigator.share({ title: `Équipe ${equipe.nom}`, url: lien }).catch(() => undefined)}
-          >
-            Partager…
-          </button>
-        )}
       </div>
       {message && <p role="status">{message}</p>}
       <label>

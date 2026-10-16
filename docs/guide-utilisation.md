@@ -249,17 +249,17 @@ Pour gagner du temps à la table de marque, chaque coach peut préparer son équ
 
 1. Accueil → **Partager une équipe**.
 2. Choisissez le club, cochez les joueurs, renseignez les n° de maillot et le coach.
-3. Touchez **Partager cette équipe** : un QR code s'affiche, avec **Copier le lien**, **Copier le code** et **Partager…** (SMS, messagerie…).
+3. Touchez **Partager cette équipe** : un QR code s'affiche, avec **Copier le code** pour l'envoyer par SMS ou messagerie.
 
 **Sur la tablette de la table de marque**
 
 1. **Nouveau match** → dans l'équipe concernée, **Importer une équipe (QR / code)**.
-2. **Scanner le QR code**, ou collez le lien / le code reçu puis **Lire le code**.
+2. **Scanner le QR code**, ou collez le code reçu puis **Lire le code**.
 3. Vérifiez l'aperçu et touchez **Utiliser cette équipe**.
 
-Si le lien reçu par message est ouvert directement, l'application propose **Nouveau match : en équipe A** ou **en équipe B**.
+Si le QR code est scanné avec l'appareil photo de la tablette plutôt que depuis l'application, il ouvre l'application qui propose **Nouveau match : en équipe A** ou **en équipe B**.
 
-> Un lien peut s'ouvrir dans le navigateur plutôt que dans l'application installée. Dans ce cas, touchez **Copier le code** puis collez-le dans l'application via **Importer une équipe (QR / code)**.
+> Le QR code peut s'ouvrir dans le navigateur plutôt que dans l'application installée. Dans ce cas, passez par **Importer une équipe (QR / code)** → **Scanner le QR code** dans l'application.
 
 ---
 
