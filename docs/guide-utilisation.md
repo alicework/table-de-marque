@@ -225,7 +225,7 @@ L'écran **Match terminé** affiche le score final et permet d'envoyer la feuill
 
 ### Officiels et capitaines
 
-Dépliez **Officiels et capitaines** pour saisir le chronométreur, l'opérateur 30", le marqueur, l'arbitre, l'aide arbitre et les deux capitaines. Tout est facultatif : une case non remplie reste vide sur la feuille, à compléter au stylo si besoin. Chaque nom est enregistré dès que vous passez au champ suivant.
+Dépliez **Officiels et capitaines** pour saisir le chronométreur, l'opérateur 30", le marqueur, l'arbitre, l'aide arbitre et les deux capitaines. Tout est facultatif : une case non remplie reste vide sur la feuille, à compléter au stylo si besoin. Chaque nom est enregistré au fil de la saisie.
 
 ### Envoyer la feuille de match
 
