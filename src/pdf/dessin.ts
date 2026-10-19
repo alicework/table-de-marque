@@ -210,7 +210,8 @@ function calculerHauteurLigne(modele: ModeleFeuille): number {
   const lignes = lignesPeriodes + lignesEquipes
   const fixe = HAUTEUR_EN_TETE + HAUTEUR_SCORE + 2 * HAUTEUR_TITRE_EQUIPE + hauteurBasDeFeuille(modele) + 4 * ESPACE
   const disponible = BAS_UTILE - MARGE - fixe
-  return Math.max(LIGNE_MIN, Math.min(LIGNE_MAX, Math.floor(disponible / lignes)))
+  // Arrondi au dixième inférieur : toute la place est prise, sans qu'une erreur d'arrondi pousse une ligne en page 2.
+  return Math.max(LIGNE_MIN, Math.min(LIGNE_MAX, Math.floor((disponible / lignes) * 10) / 10))
 }
 
 function dessinerEnTete(f: Feuille, m: ModeleFeuille) {
