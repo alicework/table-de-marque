@@ -24,10 +24,13 @@ const PAS_CASE = 10
 const HAUTEUR_EN_TETE = 48
 const HAUTEUR_SCORE = 60
 const HAUTEUR_TITRE_EQUIPE = 30
-const HAUTEUR_TITRE_OFFICIELS = 16
+const HAUTEUR_TITRE_SECTION = 16
 /** Libellé 7 pt puis une case de 22 pt, assez haute pour une signature au stylo. */
 const HAUTEUR_CASE_OFFICIEL = 33
 const HAUTEUR_SIGNATURE = 22
+const COLONNES_OFFICIELS = 3
+/** Cadre vide, rempli au stylo ou dans un lecteur PDF, parfois après le match : environ 4 lignes manuscrites. */
+const HAUTEUR_OBSERVATIONS = 60
 const ESPACE = 12
 
 type Alignement = 'gauche' | 'droite' | 'centre'
@@ -205,13 +208,7 @@ function calculerHauteurLigne(modele: ModeleFeuille): number {
   const lignesPeriodes = 1 + 3 * modele.periodes.lignes.length
   const lignesEquipes = 2 + modele.equipes.A.joueurs.length + modele.equipes.B.joueurs.length
   const lignes = lignesPeriodes + lignesEquipes
-  const fixe =
-    HAUTEUR_EN_TETE +
-    HAUTEUR_SCORE +
-    2 * HAUTEUR_TITRE_EQUIPE +
-    HAUTEUR_TITRE_OFFICIELS +
-    Math.ceil(modele.officiels.length / 2) * HAUTEUR_CASE_OFFICIEL +
-    4 * ESPACE
+  const fixe = HAUTEUR_EN_TETE + HAUTEUR_SCORE + 2 * HAUTEUR_TITRE_EQUIPE + hauteurBasDeFeuille(modele) + 4 * ESPACE
   const disponible = BAS_UTILE - MARGE - fixe
   return Math.max(LIGNE_MIN, Math.min(LIGNE_MAX, Math.floor(disponible / lignes)))
 }
@@ -346,20 +343,50 @@ function dessinerEquipe(f: Feuille, bloc: BlocEquipe, hauteurLigne: number) {
   f.y += ESPACE
 }
 
-function dessinerOfficiels(f: Feuille, m: ModeleFeuille) {
-  const rangees = Math.ceil(m.officiels.length / 2)
-  f.assurerPlace(HAUTEUR_TITRE_OFFICIELS + rangees * HAUTEUR_CASE_OFFICIEL)
+/** Officiels, observations et signatures des capitaines : un seul bloc, jamais coupé entre deux pages. */
+function hauteurBasDeFeuille(m: ModeleFeuille): number {
+  const rangeesOfficiels = Math.ceil(m.officiels.length / COLONNES_OFFICIELS)
+  return (
+    HAUTEUR_TITRE_SECTION +
+    rangeesOfficiels * HAUTEUR_CASE_OFFICIEL +
+    HAUTEUR_TITRE_SECTION +
+    HAUTEUR_OBSERVATIONS +
+    HAUTEUR_CASE_OFFICIEL
+  )
+}
+
+/** Libellé 7 pt au-dessus d'une case de signature ; `contenu`, s'il est donné, est écrit dans la case. */
+function caseSignature(f: Feuille, x: number, y: number, largeur: number, libelle: string, contenu = '') {
+  f.texte(libelle, { x, y: y + 7, taille: 7, couleur: 'texte-2', largeur })
+  f.rectangle(x, y + 9, largeur, HAUTEUR_SIGNATURE, { bordure: 'bordure' })
+  if (contenu) f.texte(contenu, { x: x + 3, y: y + 24, taille: 9, largeur: largeur - 6 })
+}
+
+function dessinerBasDeFeuille(f: Feuille, m: ModeleFeuille) {
+  f.assurerPlace(hauteurBasDeFeuille(m))
+
   f.texte('Officiels', { x: MARGE, y: f.y + 12, taille: 11, police: f.grasse })
-  f.y += HAUTEUR_TITRE_OFFICIELS
-  const largeur = (LARGEUR_UTILE - ESPACE) / 2
+  f.y += HAUTEUR_TITRE_SECTION
+  const largeurOfficiel = (LARGEUR_UTILE - (COLONNES_OFFICIELS - 1) * ESPACE) / COLONNES_OFFICIELS
   m.officiels.forEach((officiel, i) => {
-    const x = MARGE + (i % 2) * (largeur + ESPACE)
-    const y = f.y + Math.floor(i / 2) * HAUTEUR_CASE_OFFICIEL
-    f.texte(officiel.libelle, { x, y: y + 7, taille: 7, couleur: 'texte-2', largeur })
-    f.rectangle(x, y + 9, largeur, HAUTEUR_SIGNATURE, { bordure: 'bordure' })
-    if (officiel.valeur) f.texte(officiel.valeur, { x: x + 3, y: y + 24, taille: 9, largeur: largeur - 6 })
+    const x = MARGE + (i % COLONNES_OFFICIELS) * (largeurOfficiel + ESPACE)
+    const y = f.y + Math.floor(i / COLONNES_OFFICIELS) * HAUTEUR_CASE_OFFICIEL
+    caseSignature(f, x, y, largeurOfficiel, officiel.libelle, officiel.valeur)
   })
-  f.y += rangees * HAUTEUR_CASE_OFFICIEL
+  f.y += Math.ceil(m.officiels.length / COLONNES_OFFICIELS) * HAUTEUR_CASE_OFFICIEL
+
+  f.texte('Observations', { x: MARGE, y: f.y + 12, taille: 11, police: f.grasse })
+  f.y += HAUTEUR_TITRE_SECTION
+  f.rectangle(MARGE, f.y, LARGEUR_UTILE, HAUTEUR_OBSERVATIONS, { bordure: 'bordure' })
+  f.y += HAUTEUR_OBSERVATIONS
+
+  // Le nom du capitaine va dans le libellé : la case reste vide pour la signature.
+  const largeurCapitaine = (LARGEUR_UTILE - ESPACE) / 2
+  m.capitaines.forEach((capitaine, i) => {
+    const libelle = capitaine.valeur ? `${capitaine.libelle} — ${capitaine.valeur}` : capitaine.libelle
+    caseSignature(f, MARGE + i * (largeurCapitaine + ESPACE), f.y, largeurCapitaine, libelle)
+  })
+  f.y += HAUTEUR_CASE_OFFICIEL
 }
 
 function dessinerPieds(f: Feuille, m: ModeleFeuille) {
@@ -400,7 +427,7 @@ export async function dessinerFeuille(modele: ModeleFeuille, polices: PolicesFeu
   dessinerPeriodes(feuille, modele, hauteurLigne)
   dessinerEquipe(feuille, modele.equipes.A, hauteurLigne)
   dessinerEquipe(feuille, modele.equipes.B, hauteurLigne)
-  dessinerOfficiels(feuille, modele)
+  dessinerBasDeFeuille(feuille, modele)
   dessinerPieds(feuille, modele)
   return doc.save()
 }

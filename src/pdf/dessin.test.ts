@@ -72,7 +72,7 @@ describe('dessinerFeuille', () => {
       ...Array.from({ length: 4 }, () => faute('A', 'a11')),
       { type: 'finMatch' },
     )
-    match.officiels = { ...OFFICIELS_VIDES, arbitre: 'Camille R.', marqueur: 'Alex' }
+    match.officiels = { ...OFFICIELS_VIDES, arbitre: 'Camille R.', marqueur: 'Alex', capitaineA: 'Sam L.' }
     const doc = await dessiner(match, 'feuille-exemple.pdf')
     expect(doc.getPageCount()).toBe(1)
     const { width, height } = doc.getPage(0).getSize()
@@ -80,9 +80,20 @@ describe('dessinerFeuille', () => {
     expect(doc.getTitle()).toBe('Feuille de match — ST DELPHIN – GRADIGNAN')
   })
 
-  it('dessine sept cases d’officiels de 22 pt, signables au stylo', async () => {
+  it('dessine sept cases de 22 pt signables au stylo (cinq officiels, deux capitaines) et un cadre d’observations', async () => {
     await dessiner(matchDeTest())
-    expect(hauteursRectangles(derniersOctets).filter((h) => h === 22)).toHaveLength(7)
+    const hauteurs = hauteursRectangles(derniersOctets)
+    expect(hauteurs.filter((h) => h === 22)).toHaveLength(7)
+    // Le bandeau du score fait aussi 60 pt.
+    expect(hauteurs.filter((h) => h === 60)).toHaveLength(2)
+  })
+
+  it('tient sur une page avec 12 joueurs par équipe', async () => {
+    const douze = (prefixe: string) => quatorze(prefixe).slice(0, 12)
+    const match = matchDeTest({ type: 'finMatch' })
+    match.equipes = { A: { ...EQUIPE_A, joueurs: douze('a') }, B: { ...EQUIPE_B, joueurs: douze('b') } }
+    const doc = await dessiner(match, 'feuille-12-joueurs.pdf')
+    expect(doc.getPageCount()).toBe(1)
   })
 
   it('tient sur une ou deux pages avec 14 joueurs par équipe et deux prolongations', async () => {

@@ -64,8 +64,10 @@ export interface ModeleFeuille {
     lignes: LignePeriodes[]
   }
   equipes: Record<EquipeId, BlocEquipe>
-  /** 7 entrées, dans l'ordre de la feuille officielle */
+  /** 5 entrées, dans l'ordre de la feuille officielle */
   officiels: { libelle: string; valeur: string }[]
+  /** Capitaine A puis B, libellés suivis du nom de l'équipe ; signés sous le cadre d'observations */
+  capitaines: { libelle: string; valeur: string }[]
   piedDePage: string
 }
 
@@ -75,8 +77,6 @@ const LIBELLES_OFFICIELS: [keyof Officiels, string][] = [
   ['marqueur', 'Marqueur'],
   ['arbitre', 'Arbitre'],
   ['aideArbitre', 'Aide arbitre'],
-  ['capitaineA', 'Capitaine A'],
-  ['capitaineB', 'Capitaine B'],
 ]
 
 const STATS_VIDES = { points: 0, lf: 0, deuxPts: 0, troisPts: 0, fautes: 0 }
@@ -142,7 +142,6 @@ export function composerFeuille(match: Match, etat: EtatMatch, maintenant = new 
   const nomA = match.equipes.A.nom
   const nomB = match.equipes.B.nom
   const saisonDuMatch = saison(match.date)
-  const nomEquipe = (cle: keyof Officiels) => (cle === 'capitaineA' ? nomA : cle === 'capitaineB' ? nomB : null)
   return {
     titre: 'Feuille de match',
     sousTitre: saisonDuMatch ? `Basket loisir UFOLEP 33 · Saison ${saisonDuMatch}` : 'Basket loisir UFOLEP 33',
@@ -160,10 +159,11 @@ export function composerFeuille(match: Match, etat: EtatMatch, maintenant = new 
       lignes: [composerLignePeriodes(match, etat, 'A'), composerLignePeriodes(match, etat, 'B')],
     },
     equipes: { A: composerEquipe(match, etat, 'A'), B: composerEquipe(match, etat, 'B') },
-    officiels: LIBELLES_OFFICIELS.map(([cle, libelle]) => {
-      const equipe = nomEquipe(cle)
-      return { libelle: equipe ? `${libelle} (${equipe})` : libelle, valeur: match.officiels[cle] }
-    }),
+    officiels: LIBELLES_OFFICIELS.map(([cle, libelle]) => ({ libelle, valeur: match.officiels[cle] })),
+    capitaines: [
+      { libelle: `Capitaine A (${nomA})`, valeur: match.officiels.capitaineA },
+      { libelle: `Capitaine B (${nomB})`, valeur: match.officiels.capitaineB },
+    ],
     piedDePage: `Généré par Table de marque le ${formaterDateCourte(maintenant)} à ${formaterHeure(maintenant)}`,
   }
 }

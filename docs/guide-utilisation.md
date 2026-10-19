@@ -234,7 +234,7 @@ Dépliez **Officiels et capitaines** pour saisir le chronométreur, l'opérateur
 3. Touchez **Préparer l'e-mail** : votre messagerie s'ouvre avec le destinataire (`cd.33@ufolep.org`), le coach adverse en copie, l'objet et le texte déjà écrits.
 4. **Joignez le fichier PDF** à l'e-mail, puis envoyez.
 
-La feuille tient sur une page : score, points par période, fautes d'équipe et temps morts, joueurs de chaque équipe avec leurs points et fautes, officiels, date et lieu.
+La feuille tient sur une page : score, points par période, fautes d'équipe et temps morts, joueurs de chaque équipe avec leurs points et fautes, officiels, date et lieu. En bas, un cadre **Observations** et une case de signature par capitaine restent vides : ils se remplissent à la main sur la feuille imprimée ou dans un lecteur PDF, y compris plusieurs jours après le match (par exemple quand l'assurance d'un joueur blessé demande la feuille signée).
 
 - **Rouvrir pour corriger** permet de revenir sur une erreur constatée après coup ; regénérez ensuite la feuille.
 - **Accueil** revient à l'écran principal.

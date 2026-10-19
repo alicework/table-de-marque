@@ -94,7 +94,8 @@ export interface ModeleFeuille {
     lignes: LignePeriodes[]         // une par équipe, A puis B
   }
   equipes: Record<EquipeId, BlocEquipe>
-  officiels: { libelle: string; valeur: string }[]   // 7 entrées, dans l'ordre de la feuille officielle
+  officiels: { libelle: string; valeur: string }[]   // 5 entrées, dans l'ordre de la feuille officielle
+  capitaines: { libelle: string; valeur: string }[]  // capitaine A puis B
   piedDePage: string                // « Généré par Table de marque le 16/10/2026 à 21:05 »
 }
 
@@ -133,7 +134,8 @@ Règles de composition :
 
 - `colonnes` : `libellePeriode` de chaque période de `etat.periodes`, puis « Total ».
 - `mention` : `null` sans prolongation ; « après prolongation » pour une ; « après N prolongations » au-delà.
-- `officiels` : libellés « Chronométreur », « Opérateur 30" », « Marqueur », « Arbitre », « Aide arbitre », « Capitaine A », « Capitaine B », valeurs de `match.officiels` (vides possibles). « Capitaine A » et « Capitaine B » sont suivis du nom de l'équipe entre parenthèses.
+- `officiels` : libellés « Chronométreur », « Opérateur 30" », « Marqueur », « Arbitre », « Aide arbitre », valeurs de `match.officiels` (vides possibles).
+- `capitaines` : libellés « Capitaine A » et « Capitaine B » suivis du nom de l'équipe entre parenthèses, valeurs `match.officiels.capitaineA` / `capitaineB` (vides possibles).
 - `sousTitre` : saison calculée depuis `match.date` (de septembre à août : `2026-09-01` → « 2026-2027 », `2027-03-01` → « 2026-2027 »).
 - `date` : `Intl.DateTimeFormat('fr-FR', { dateStyle: 'full' })` sur `match.date` interprétée en heure locale ; jamais de décalage de jour.
 - `piedDePage` : `maintenant` fourni par l'appelant (testabilité).
@@ -143,15 +145,17 @@ Règles de composition :
 `dessinerFeuille(modele, polices)` avec `polices = { normale: Uint8Array; grasse: Uint8Array }`, renvoie `Promise<Uint8Array>`.
 
 - A4 portrait (595,28 × 841,89 pt), marges 36 pt, police Manrope (Regular et Bold, embarquées en **sous-ensemble**), couleurs de `couleurs.ts`.
-- Une seule page. Si le contenu déborde (14 joueurs par équipe et plusieurs prolongations), les hauteurs de lignes des tableaux se réduisent jusqu'à un minimum de 10 pt ; au-delà, une seconde page reçoit le bloc de l'équipe B et les officiels. La seconde page n'est attendue qu'en cas extrême et le test ne l'exige pas.
+- Une seule page. Si le contenu déborde (14 joueurs par équipe et plusieurs prolongations), les hauteurs de lignes des tableaux se réduisent jusqu'à un minimum de 10 pt ; au-delà, une seconde page reçoit le bloc de l'équipe B et le bas de feuille. Le bas de feuille (officiels, observations, capitaines) n'est jamais coupé entre deux pages. La seconde page n'est attendue qu'en cas extrême et le test ne l'exige pas.
 - Un utilitaire interne de tableau (colonnes à largeur fixe, en-tête sur fond `surface-2`, lignes alternées `surface` / `fond`, texte aligné à gauche pour les noms et à droite pour les nombres) sert aux trois tableaux.
 - Mise en page de haut en bas :
   1. **En-tête** : `titre` en Bold 22 pt, `sousTitre` en Regular 10 pt `texte-2` ; à droite, `date` et `lieu`.
   2. **Score** : bandeau sur fond `accent-tint` ; `nomA` en `equipe-a`, `nomB` en `equipe-b`, scores en Bold 32 pt, `mention` en 10 pt dessous.
   3. **Tableau des périodes** : colonnes « Équipe », « », puis une colonne par entrée de `colonnes`. Trois lignes par équipe : « Points » (avec le total), « Fautes d'équipe » et « Temps morts » (sans total). Le nom de l'équipe n'est écrit que sur la ligne « Points ».
   4. **Bloc équipe A puis B** : barre de couleur d'équipe à gauche, titre `nom` + « Maillot : couleur », ligne « Coach : … (x faute(s)) » ou « Coach : — ». Tableau des joueurs : N°, Nom, Licence, LF, 2 pts, 3 pts, Points, Fautes. La colonne Fautes dessine 5 cases de 7 pt ; les cases atteintes sont remplies en `faute`, la 5ᵉ en `danger` quand `exclu`.
-  5. **Officiels** : grille de 7 cases (2 colonnes), libellé en 8 pt `texte-2`, valeur en 10 pt ou case vide d'une hauteur de 22 pt (signable au stylo).
-  6. **Pied de page** sur chaque page : `piedDePage` à gauche, « Page n/N » à droite, 8 pt `texte-2`.
+  5. **Officiels** : grille de 5 cases (3 colonnes), libellé en 7 pt `texte-2`, valeur en 9 pt ou case vide d'une hauteur de 22 pt (signable au stylo).
+  6. **Observations** : cadre vide pleine largeur de 60 pt, rempli à la main ou dans un lecteur PDF, éventuellement après le match (déclaration d'assurance d'un joueur blessé, par exemple). Rien n'est saisi dans l'application.
+  7. **Capitaines** : deux cases côte à côte de 22 pt, toujours vides pour la signature (papier ou numérique) ; le nom saisi en fin de match suit le libellé (« Capitaine A (ST DELPHIN) — Sam L. »).
+  8. **Pied de page** sur chaque page : `piedDePage` à gauche, « Page n/N » à droite, 8 pt `texte-2`.
 - Manrope couvre le latin étendu. Un caractère absent de la police (emoji dans un nom d'équipe, par exemple) est remplacé par « ? » avant le dessin : un nom fantaisiste ne doit jamais empêcher d'envoyer la feuille. Les textes trop longs pour leur colonne sont coupés avec « … ».
 
 ### 5.4 Courriel et nom de fichier

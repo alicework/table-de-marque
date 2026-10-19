@@ -141,25 +141,24 @@ describe('composerFeuille — équipes', () => {
   })
 })
 
-describe('composerFeuille — officiels', () => {
-  it('sept cases dans l’ordre de la feuille, vides par défaut', () => {
-    const { officiels } = composer(matchDeTest())
+describe('composerFeuille — officiels et capitaines', () => {
+  it('cinq officiels puis deux capitaines, dans l’ordre de la feuille, vides par défaut', () => {
+    const { officiels, capitaines } = composer(matchDeTest())
     expect(officiels.map((o) => o.libelle)).toEqual([
       'Chronométreur',
       'Opérateur 30"',
       'Marqueur',
       'Arbitre',
       'Aide arbitre',
-      'Capitaine A (ST DELPHIN)',
-      'Capitaine B (GRADIGNAN)',
     ])
-    expect(officiels.every((o) => o.valeur === '')).toBe(true)
+    expect(capitaines.map((c) => c.libelle)).toEqual(['Capitaine A (ST DELPHIN)', 'Capitaine B (GRADIGNAN)'])
+    expect([...officiels, ...capitaines].every((o) => o.valeur === '')).toBe(true)
   })
 
   it('reprend les valeurs saisies', () => {
     const match = { ...matchDeTest(), officiels: { ...OFFICIELS_VIDES, arbitre: 'Camille R.', capitaineB: 'Alex' } }
-    const { officiels } = composer(match)
+    const { officiels, capitaines } = composer(match)
     expect(officiels[3]).toEqual({ libelle: 'Arbitre', valeur: 'Camille R.' })
-    expect(officiels[6]).toEqual({ libelle: 'Capitaine B (GRADIGNAN)', valeur: 'Alex' })
+    expect(capitaines[1]).toEqual({ libelle: 'Capitaine B (GRADIGNAN)', valeur: 'Alex' })
   })
 })
